@@ -43,7 +43,7 @@ const Home: NextPage = () => {
                 <hr />
                 <div className="p-2" />
                 <p className="text-sm font-semibold text-gray-200">
-                  This is where you look at how you've progressed.
+                  This is where you look at how you have progressed.
                 </p>
               </div>
             </Link>
