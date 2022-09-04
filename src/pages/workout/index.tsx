@@ -35,9 +35,10 @@ const WorkoutPage: NextPage = () => {
         <div className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3">
           {workouts.data ? (
             <>
-              {workouts.data.map((thing) => {
+              {workouts.data.map((thing, index) => {
                 return (
                   <WorkoutItem
+                    key={index}
                     name={thing.name}
                     description={thing.description ? thing.description : ""}
                     id={thing.id}
