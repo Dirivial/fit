@@ -29,7 +29,7 @@ const Home: NextPage = () => {
                 <hr />
                 <div className="p-2" />
                 <p className="text-sm font-semibold text-gray-200">
-                  This is where you workout.
+                  Start working out!
                 </p>
               </div>
             </Link>
@@ -43,7 +43,7 @@ const Home: NextPage = () => {
                 <hr />
                 <div className="p-2" />
                 <p className="text-sm font-semibold text-gray-200">
-                  This is where you look at how you have progressed.
+                  Take a look at how you have progressed.
                 </p>
               </div>
             </Link>
@@ -55,30 +55,3 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-
-type PageLinkCardProps = {
-  name: string;
-  description: string;
-  documentation: string;
-};
-
-const PageLinkCard = ({
-  name,
-  description,
-  documentation,
-}: PageLinkCardProps) => {
-  return (
-    <section className="flex flex-col justify-center duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
-      <Link href={documentation}>
-        <div className="p-6 cursor-pointer flex-grow">
-          <h2 className="text-xl justify-start font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-500 to-sky-600">
-            {name}
-          </h2>
-          <hr />
-          <div className="p-2" />
-          <p className="h-fill text-sm text-gray-200">{description}</p>
-        </div>
-      </Link>
-    </section>
-  );
-};
