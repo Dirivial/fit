@@ -18,21 +18,39 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="container mx-auto flex flex-col items-center justify-center min-h-screen p-4">
-        <h1 className="text-5xl md:text-[5rem] leading-normal font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-green-700 to-indigo-500">
+        <h1 className="text-5xl md:text-[5rem] leading-normal font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-green-400 via-violet-800 to-indigo-500">
           Fit.Dirivial
         </h1>
         <p className="text-2xl text-gray-200">What would you like to do?</p>
         <div className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3">
-          <PageLinkCard
-            name="Workout"
-            description="This is where you workout."
-            documentation="/workout"
-          />
-          <PageLinkCard
-            name="Analyze"
-            description="This is where you look at how you've progressed."
-            documentation="/analysis"
-          />
+          <section className="flex flex-col justify-center duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
+            <Link href="/workout">
+              <div className="p-6 cursor-pointer flex-grow">
+                <h2 className="text-2xl justify-start font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-700 to-red-600">
+                  Workout
+                </h2>
+                <hr />
+                <div className="p-2" />
+                <p className="text-sm font-semibold text-gray-200">
+                  This is where you workout.
+                </p>
+              </div>
+            </Link>
+          </section>
+          <section className="flex flex-col justify-center duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
+            <Link href="/analysis">
+              <div className="p-6 cursor-pointer flex-grow">
+                <h2 className="text-2xl justify-start font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-500 to-violet-700">
+                  Analyze
+                </h2>
+                <hr />
+                <div className="p-2" />
+                <p className="text-sm font-semibold text-gray-200">
+                  This is where you look at how you've progressed.
+                </p>
+              </div>
+            </Link>
+          </section>
         </div>
         <div className="pt-6 text-2xl text-blue-500 flex justify-center items-center w-full">
           {hello.data ? <p>{hello.data.greeting}</p> : <p>Loading..</p>}
