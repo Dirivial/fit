@@ -1,32 +1,22 @@
 import type { NextPage } from "next";
-import Head from "next/head";
 import Link from "next/link";
 import { trpc } from "../../utils/trpc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import HomeHeader from "../components/homeHeader";
+import SetHead from "../components/setHead";
 
-const WorkoutPage: NextPage = () => {
+const WorkoutListPage: NextPage = () => {
   const workouts = trpc.useQuery(["workout.getAll", { id: 1 }]);
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
 
   return (
     <>
-      <Head>
-        <title>Fit.Dirivial</title>
-        <meta
-          name="description"
-          content="Fitness/workout app made by Dirivial"
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <SetHead />
 
       <main className="container mx-auto flex flex-col items-center min-h-screen p-4">
-        <h1 className="text-2xl leading-normal hover:cursor-pointer font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-green-400 via-violet-800 to-indigo-500">
-          <Link href="/" className="">
-            Fit.Dirivial
-          </Link>
-        </h1>
+        <HomeHeader size="text-2xl" />
 
         <div className="p-6" />
         <h2 className="text-2xl text-gray-200">Choose a Workout</h2>
@@ -62,7 +52,7 @@ const WorkoutPage: NextPage = () => {
   );
 };
 
-export default WorkoutPage;
+export default WorkoutListPage;
 
 type WorkoutItemProps = {
   name: string;
