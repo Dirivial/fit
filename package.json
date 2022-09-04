@@ -10,6 +10,11 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^1.0.0-beta.3",
+    "@fortawesome/fontawesome-svg-core": "^6.2.0",
+    "@fortawesome/free-regular-svg-icons": "^6.2.0",
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@prisma/client": "^4.3.1",
     "@trpc/client": "^9.27.2",
     "@trpc/next": "^9.27.2",

@@ -2,9 +2,13 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { trpc } from "../../utils/trpc";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const WorkoutPage: NextPage = () => {
   const workouts = trpc.useQuery(["workout.getAll", { id: 1 }]);
+  const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
 
   return (
     <>
@@ -32,26 +36,27 @@ const WorkoutPage: NextPage = () => {
             <Link href="/workout/free-form/">pick individual exercises...</Link>
           </span>
         </h4>
-        <div className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3">
-          {workouts.data ? (
-            <>
-              {workouts.data.map((thing, index) => {
-                return (
-                  <WorkoutItem
-                    key={index}
-                    name={thing.name}
-                    description={thing.description ? thing.description : ""}
-                    id={thing.id}
-                  />
-                );
-              })}
-            </>
-          ) : (
-            <div className="">
-              <div className="animate-spin">I</div>Loading...
-            </div>
-          )}
-        </div>
+        {workouts.data ? (
+          <div
+            ref={workoutsRef}
+            className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3"
+          >
+            {workouts.data.map((thing, index) => {
+              return (
+                <WorkoutItem
+                  key={index}
+                  name={thing.name}
+                  description={thing.description ? thing.description : ""}
+                  id={thing.id}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-lg font-semibold text-violet-600 p-6">
+            <FontAwesomeIcon icon={faSpinner} className="animate-spin w-10" />
+          </div>
+        )}
       </main>
     </>
   );
@@ -76,7 +81,6 @@ const WorkoutItem = ({ name, description, id }: WorkoutItemProps) => {
           <hr />
           <div className="p-2" />
           <p className="h-fill text-sm text-gray-200">{description}</p>
-          <div className="p-1" />
         </div>
       </Link>
     </section>
