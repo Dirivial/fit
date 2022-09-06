@@ -39,8 +39,8 @@ const WorkoutPage: NextPage = () => {
                   key={index}
                   name={exercise.name}
                   description={exercise.description ? exercise.description : ""}
-                  sets={exercise.defaultSets}
-                  reps={exercise.defaultSets}
+                  sets={exercise.sets}
+                  reps={exercise.reps}
                   id={exercise.id}
                 />
               );
