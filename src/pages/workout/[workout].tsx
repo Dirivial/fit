@@ -26,13 +26,13 @@ const WorkoutPage: NextPage = () => {
         <div className="p-6" />
         <div className="flex gap-x-10">
           <Link href={`/workout`}>
-            <button className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200">
+            <button className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
               Back
             </button>
           </Link>
           <div />
           <Link href={`/workout`}>
-            <button className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200">
+            <button className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
               Edit
             </button>
           </Link>
@@ -59,7 +59,7 @@ const WorkoutPage: NextPage = () => {
         )}
         <div className="p-2" />
         <Link href="/workout">
-          <button className="p-3 font-bold border-2 border-pink-700 text-xl text-pink-600 rounded shadow-xl">
+          <button className="p-3 font-bold border-2 border-pink-700 text-xl text-pink-600 rounded shadow-xl duration-500 motion-safe:hover:scale-105">
             Initiate Workout
           </button>
         </Link>
@@ -101,17 +101,25 @@ const ExerciseItem = ({
         <div className="flex flex-col justify-center text-lg p-2 text-center text-gray-200">
           <h3>Sets</h3>
           <div className="flex">
-            <button className="p-1 rounded-full text-indigo-500">+</button>
-            <p className="p-1">{sets}</p>
-            <button className="p-1 rounded-full text-indigo-500">-</button>
+            <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
+              +
+            </button>
+            <p className="p-1 hover:cursor-default">{sets}</p>
+            <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
+              -
+            </button>
           </div>
         </div>
         <div className="flex flex-col justify-center text-lg p-2 text-center text-gray-200">
           <h3>Reps</h3>
           <div className="flex">
-            <button className="p-1 rounded-full text-indigo-500">+</button>
-            <p className="p-1">{reps}</p>
-            <button className="p-1 rounded-full text-indigo-500">-</button>
+            <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
+              +
+            </button>
+            <p className="p-1 hover:cursor-default">{reps}</p>
+            <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
+              -
+            </button>
           </div>
         </div>
       </section>
