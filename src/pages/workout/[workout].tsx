@@ -30,12 +30,6 @@ const WorkoutPage: NextPage = () => {
               Back
             </button>
           </Link>
-          <div />
-          <Link href={`/workout`}>
-            <button className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
-              Edit
-            </button>
-          </Link>
         </div>
         {exercises.data ? (
           <div ref={workoutsRef} className="flex flex-col gap-y-1 pt-3">
