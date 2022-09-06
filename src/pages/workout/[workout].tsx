@@ -24,22 +24,30 @@ const WorkoutPage: NextPage = () => {
         <HomeHeader size="text-2xl" />
 
         <div className="p-6" />
-        <h2 className="text-2xl text-gray-200">Choose a Workout</h2>
-        <h4 className="text-lg text-gray-200">
-          or{" "}
-          <span className="text-indigo-400">
-            <Link href="/workout/free-form/">pick individual exercises...</Link>
-          </span>
-        </h4>
+        <div className="flex gap-x-10">
+          <Link href={`/workout`}>
+            <button className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200">
+              Back
+            </button>
+          </Link>
+          <div />
+          <Link href={`/workout`}>
+            <button className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200">
+              Edit
+            </button>
+          </Link>
+        </div>
         {exercises.data ? (
           <div ref={workoutsRef} className="flex flex-col gap-y-1 pt-3">
-            {exercises.data.exercise.map((thing, index) => {
+            {exercises.data.exercise.map((exercise, index) => {
               return (
                 <ExerciseItem
                   key={index}
-                  name={thing.name}
-                  description={thing.description ? thing.description : ""}
-                  id={thing.id}
+                  name={exercise.name}
+                  description={exercise.description ? exercise.description : ""}
+                  sets={exercise.defaultSets}
+                  reps={exercise.defaultSets}
+                  id={exercise.id}
                 />
               );
             })}
@@ -49,6 +57,12 @@ const WorkoutPage: NextPage = () => {
             <FontAwesomeIcon icon={faSpinner} className="animate-spin w-10" />
           </div>
         )}
+        <div className="p-2" />
+        <Link href="/workout">
+          <button className="p-3 font-bold border-2 border-pink-700 text-xl text-pink-600 rounded shadow-xl">
+            Initiate Workout
+          </button>
+        </Link>
       </main>
     </>
   );
@@ -59,19 +73,48 @@ export default WorkoutPage;
 type ExerciseItemProps = {
   name: string;
   description: string;
+  sets: number;
+  reps: number;
   id: number;
 };
 
-const ExerciseItem = ({ name, description, id }: ExerciseItemProps) => {
+const ExerciseItem = ({
+  name,
+  description,
+  sets,
+  reps,
+  id,
+}: ExerciseItemProps) => {
   return (
-    <section className="flex flex-row justify-center duration-500 border-2 border-pink-700 rounded shadow-xl motion-safe:hover:scale-105">
-      <div className="p-6 flex-grow">
-        <h2 className="text-xl justify-start font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-700 to-red-600">
-          {name}
-        </h2>
-        <div className="p-2" />
-        <p className="text-sm text-gray-200">{description}</p>
-      </div>
-    </section>
+    <div className="flex sm:flex-row flex-col justify-end">
+      <section className="flex flex-row flex-grow justify-center border-2 border-pink-700 rounded shadow-xl">
+        <div className="p-6 flex-grow">
+          <h2 className="text-xl justify-start font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-700 via-pink-700 to-red-600">
+            {name}
+          </h2>
+          <div className="p-2" />
+          <p className="text-sm text-gray-200">{description}</p>
+        </div>
+      </section>
+      <div className="p-1" />
+      <section className="flex justify-around border-2 border-pink-700 rounded shadow-xl">
+        <div className="flex flex-col justify-center text-lg p-2 text-center text-gray-200">
+          <h3>Sets</h3>
+          <div className="flex">
+            <button className="p-1 rounded-full text-indigo-500">+</button>
+            <p className="p-1">{sets}</p>
+            <button className="p-1 rounded-full text-indigo-500">-</button>
+          </div>
+        </div>
+        <div className="flex flex-col justify-center text-lg p-2 text-center text-gray-200">
+          <h3>Reps</h3>
+          <div className="flex">
+            <button className="p-1 rounded-full text-indigo-500">+</button>
+            <p className="p-1">{reps}</p>
+            <button className="p-1 rounded-full text-indigo-500">-</button>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
