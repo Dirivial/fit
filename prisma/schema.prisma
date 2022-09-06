@@ -12,15 +12,12 @@ datasource db {
     referentialIntegrity = "prisma"
 }
 
-model Example {
-    id String @id @default(cuid())
-}
-
 model User {
-    id      Int       @id @default(autoincrement())
-    name    String
-    email   String
-    workout Workout[]
+    id              Int                 @id @default(autoincrement())
+    name            String
+    email           String
+    workout         Workout[]
+    exerciseHistory PerformedExercise[]
 }
 
 model Workout {
@@ -33,11 +30,26 @@ model Workout {
 }
 
 model Exercise {
-    id          Int      @id @default(autoincrement())
-    workout     Workout? @relation(fields: [workoutId], references: [id])
-    workoutId   Int?
-    name        String
-    description String
-    defaultSets Int      @default(5)
-    defaultReps Int      @default(5)
+    id                Int                 @id @default(autoincrement())
+    workout           Workout?            @relation(fields: [workoutId], references: [id])
+    workoutId         Int?
+    name              String
+    description       String
+    sets              Int                 @default(5)
+    reps              Int                 @default(5)
+    weigth            Int                 @default(0)
+    restTime          Int                 @default(120)
+    PerformedExercise PerformedExercise[]
+}
+
+model PerformedExercise {
+    id         Int       @id @default(autoincrement())
+    date       DateTime?
+    sets       Int
+    reps       Int
+    weigth     Int
+    Exercise   Exercise? @relation(fields: [exerciseId], references: [id])
+    exerciseId Int?
+    User       User?     @relation(fields: [userId], references: [id])
+    userId     Int?
 }
