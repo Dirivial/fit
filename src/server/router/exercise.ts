@@ -16,6 +16,6 @@ export const exerciseRouter = createRouter()
   })
   .query("getAll", {
     async resolve({ ctx }) {
-      return await ctx.prisma.example.findMany();
+      return await ctx.prisma.exercise.findMany();
     },
   });
