@@ -75,6 +75,7 @@ const WorkoutPage: NextPage = () => {
         </Link>
         <AddWorkoutModal
           userid={1}
+          workoutid={workoutId}
           open={openModal}
           closeModal={() => setOpenModal(false)}
         />

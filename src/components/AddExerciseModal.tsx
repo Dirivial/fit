@@ -8,21 +8,29 @@ import { faSort, faCheck } from "@fortawesome/free-solid-svg-icons";
 
 type AddWorkoutModalProps = {
   userid: number;
+  workoutid: number;
   open: boolean;
   closeModal: () => void;
 };
 
 export const AddWorkoutModal = ({
   userid,
+  workoutid,
   open,
   closeModal,
 }: AddWorkoutModalProps) => {
+  const context = trpc.useContext();
   const exercises = trpc.useQuery(["exerciseTemplate.getAll", { id: userid }]);
   const [selected, setSelected] = useState<ExerciseTemplate>();
   const [query, setQuery] = useState("");
 
-  const addExercise = () => {
-    //trpc.useQuery([""])
+  const addExercise = async () => {
+    if (!selected) return;
+    const res = await context.fetchQuery([
+      "workout_ExerciseTemplate.addNew",
+      { workoutId: workoutid, exerciseTemplateId: selected.id },
+    ]);
+    closeModal();
   };
 
   if (exercises.data) {
@@ -154,7 +162,7 @@ export const AddWorkoutModal = ({
                       <button
                         type="button"
                         className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                        onClick={closeModal}
+                        onClick={addExercise}
                       >
                         Save
                       </button>
