@@ -1,5 +1,6 @@
 import { createRouter } from "./context";
 import { z } from "zod";
+import { isPlainObject } from "react-query/types/core/utils";
 
 export const workout_ExerciseTemplate = createRouter()
   .query("getWorkoutExercises", {
@@ -12,6 +13,20 @@ export const workout_ExerciseTemplate = createRouter()
           workoutId: input.workoutId,
         },
         include: { ExerciseTemplate: true },
+      });
+    },
+  })
+  .query("addNew", {
+    input: z.object({
+      workoutId: z.number(),
+      exerciseTemplateId: z.number(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.workout_ExerciseTemplate.create({
+        data: {
+          workoutId: input.workoutId,
+          exerciseTemplateId: input.exerciseTemplateId,
+        },
       });
     },
   })
