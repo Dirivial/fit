@@ -1,21 +1,26 @@
 import { createRouter } from "./context";
 import { z } from "zod";
 
-export const exerciseRouter = createRouter()
+export const exercise = createRouter()
   .query("get", {
-    input: z
-      .object({
-        text: z.string().nullish(),
-      })
-      .nullish(),
-    resolve({ input }) {
-      return {
-        greeting: `Hello ${input?.text ?? "world"}`,
-      };
+    input: z.object({
+      id: z.number(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.exercise.findFirst({
+        where: {
+          id: input.id,
+        },
+      });
     },
   })
   .query("getAll", {
-    async resolve({ ctx }) {
-      return await ctx.prisma.exercise.findMany();
+    input: z.object({
+      id: z.number(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.exerciseTemplate.findMany({
+        where: { userId: input.id },
+      });
     },
   });

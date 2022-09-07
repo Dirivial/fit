@@ -19,11 +19,11 @@ const WorkoutListPage: NextPage = () => {
         <HomeHeader size="text-2xl" />
 
         <div className="p-6" />
-        <h2 className="text-2xl text-gray-200">Choose a Workout</h2>
+        <h2 className="text-2xl text-gray-200">Choose Workout</h2>
         <h4 className="text-lg text-gray-200">
           or{" "}
           <span className="text-indigo-400">
-            <Link href="/workout/free-form/">pick individual exercises...</Link>
+            <Link href="/workout/free-form/">create</Link>
           </span>
         </h4>
         {workouts.data ? (

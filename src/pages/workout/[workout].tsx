@@ -5,16 +5,22 @@ import { trpc } from "../../utils/trpc";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import HomeHeader from "../components/homeHeader";
 import SetHead from "../components/setHead";
+import { AddWorkoutModal } from "../components/AddExerciseModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
 const WorkoutPage: NextPage = () => {
   const router = useRouter();
   const { workout } = router.query;
   const workoutId = Number(workout);
-  const exercises = trpc.useQuery(["workout.get", { id: workoutId }]);
+  const workoutItem = trpc.useQuery([
+    "workout_ExerciseTemplate.getWorkoutExercises",
+    { workoutId: workoutId },
+  ]);
 
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
+  const [openModal, setOpenModal] = useState(false);
 
   return (
     <>
@@ -31,9 +37,10 @@ const WorkoutPage: NextPage = () => {
             </button>
           </Link>
         </div>
-        {exercises.data ? (
-          <div ref={workoutsRef} className="flex flex-col gap-y-1 pt-3">
-            {exercises.data.exercise.map((exercise, index) => {
+        {workoutItem.data ? (
+          <div ref={workoutsRef} className="flex flex-col gap-y-1 pt-3 w-4/5">
+            {workoutItem.data.map((workout_exercise, index) => {
+              const exercise = workout_exercise.ExerciseTemplate;
               return (
                 <ExerciseItem
                   key={index}
@@ -52,11 +59,25 @@ const WorkoutPage: NextPage = () => {
           </div>
         )}
         <div className="p-2" />
+        <div className="">
+          <button
+            onClick={() => setOpenModal(true)}
+            className="border-2 rounded border-pink-700 text-gray-200 p-1"
+          >
+            <FontAwesomeIcon icon={faPlus} className="w-6" />
+          </button>
+        </div>
+        <div className="p-2" />
         <Link href="/workout">
-          <button className="p-3 font-bold border-2 border-pink-700 text-xl text-pink-600 rounded shadow-xl duration-500 motion-safe:hover:scale-105">
+          <button className="p-3 font-bold border-2 border-pink-700 text-xl text-gray-200 rounded shadow-xl duration-500 motion-safe:hover:scale-105">
             Initiate Workout
           </button>
         </Link>
+        <AddWorkoutModal
+          userid={1}
+          open={openModal}
+          closeModal={() => setOpenModal(false)}
+        />
       </main>
     </>
   );

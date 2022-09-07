@@ -1,17 +1,17 @@
 import { createRouter } from "./context";
 import { z } from "zod";
 
-export const workoutRouter = createRouter()
-  .query("get", {
+export const workout_ExerciseTemplate = createRouter()
+  .query("getWorkoutExercises", {
     input: z.object({
-      id: z.number(),
+      workoutId: z.number(),
     }),
     async resolve({ ctx, input }) {
-      return await ctx.prisma.workout.findFirst({
+      return await ctx.prisma.workout_ExerciseTemplate.findMany({
         where: {
-          id: input.id,
+          workoutId: input.workoutId,
         },
-        include: { Workout_ExerciseTemplate: true },
+        include: { ExerciseTemplate: true },
       });
     },
   })
