@@ -17,7 +17,7 @@ const WorkoutPage: NextPage = () => {
   const workoutItem = trpc.useQuery([
     "workout_ExerciseTemplate.getWorkoutExercises",
     { workoutId: workoutId },
-  ]);
+  ]).data;
 
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
   const [openModal, setOpenModal] = useState(false);
@@ -37,9 +37,9 @@ const WorkoutPage: NextPage = () => {
             </button>
           </Link>
         </div>
-        {workoutItem.data ? (
+        {workoutItem ? (
           <div ref={workoutsRef} className="flex flex-col gap-y-1 pt-3 w-4/5">
-            {workoutItem.data.map((workout_exercise, index) => {
+            {workoutItem.map((workout_exercise, index) => {
               const exercise = workout_exercise.ExerciseTemplate;
               return (
                 <ExerciseItem
