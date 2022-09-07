@@ -4,8 +4,8 @@ import { trpc } from "../../utils/trpc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import HomeHeader from "../components/homeHeader";
-import SetHead from "../components/setHead";
+import HomeHeader from "../../components/homeHeader";
+import SetHead from "../../components/setHead";
 
 const WorkoutListPage: NextPage = () => {
   const workouts = trpc.useQuery(["workout.getAll", { id: 1 }]);
