@@ -14,6 +14,22 @@ export const exerciseTemplate = createRouter()
       });
     },
   })
+  .query("create", {
+    input: z.object({
+      userid: z.number(),
+      name: z.string(),
+      description: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.exerciseTemplate.create({
+        data: {
+          userId: input.userid,
+          name: input.name,
+          description: input.description,
+        },
+      });
+    },
+  })
   .query("getAll", {
     input: z.object({
       id: z.number(),

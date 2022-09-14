@@ -2,7 +2,7 @@ import { Dialog, Transition, Combobox, Tab } from "@headlessui/react";
 import { ExerciseTemplate } from "@prisma/client";
 import { Fragment, useState } from "react";
 import { trpc } from "../utils/trpc";
-
+import { Exercise } from "@prisma/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSort, faCheck } from "@fortawesome/free-solid-svg-icons";
 
@@ -10,6 +10,7 @@ type AddWorkoutModalProps = {
   userid: number;
   workoutid: number;
   open: boolean;
+  addExercise: (id: number) => void;
   closeModal: () => void;
 };
 
@@ -17,6 +18,7 @@ export const AddWorkoutModal = ({
   userid,
   workoutid,
   open,
+  addExercise,
   closeModal,
 }: AddWorkoutModalProps) => {
   const context = trpc.useContext();
@@ -26,23 +28,35 @@ export const AddWorkoutModal = ({
 
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
-  const [sets, setSets] = useState("");
-  const [reps, setReps] = useState("");
 
-  const addExercise = async () => {
+  const addExerciseFromTemplate = async () => {
     if (!selected) return;
     const res = await context.fetchQuery([
       "exercise.create",
       { workoutId: workoutid, templateId: selected.id },
     ]);
-    console.log(res);
+    // Send result to [workout].tsx, it should then add the exercise to its workout list
+    addExercise(res.id);
     closeModal();
   };
 
   const createExercise = async () => {
     // Create a new template, then add it to this workout
-    console.log("pls lemme create", name, desc, sets, reps);
-    return;
+    const res = await context.fetchQuery([
+      "exerciseTemplate.create",
+      {
+        name: name,
+        description: desc,
+        userid: 1,
+      },
+    ]);
+    // Return this to workout so it can be added
+    const res2 = await context.fetchQuery([
+      "exercise.create",
+      { workoutId: workoutid, templateId: res.id },
+    ]);
+    addExercise(res2.id);
+    closeModal();
   };
 
   if (exercises.data) {
@@ -186,7 +200,7 @@ export const AddWorkoutModal = ({
                             <button
                               type="button"
                               className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                              onClick={addExercise}
+                              onClick={addExerciseFromTemplate}
                             >
                               Save
                             </button>
@@ -207,20 +221,6 @@ export const AddWorkoutModal = ({
                             <input
                               value={desc}
                               onChange={(e) => setDesc(e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <label>Sets</label>
-                            <input
-                              value={sets}
-                              onChange={(e) => setSets(e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <label>Reps</label>
-                            <input
-                              value={reps}
-                              onChange={(e) => setReps(e.target.value)}
                             />
                           </div>
                           <div className="flex justify-between">

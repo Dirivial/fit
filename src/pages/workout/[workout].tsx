@@ -8,20 +8,44 @@ import SetHead from "../../components/setHead";
 import { AddWorkoutModal } from "../../components/AddExerciseModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
-import { ExerciseSet } from "@prisma/client";
+import { useEffect, useState } from "react";
+import { Exercise, ExerciseSet, ExerciseTemplate } from "@prisma/client";
+
+type ExerciseItemType = Exercise & {
+  ExerciseTemplate: ExerciseTemplate | null;
+  ExerciseSets: ExerciseSet[];
+};
 
 const WorkoutPage: NextPage = () => {
   const router = useRouter();
   const { workout } = router.query;
   const workoutId = Number(workout);
-  const workoutItem = trpc.useQuery([
-    "exercise.getWorkoutExercises",
-    { workoutId },
-  ]).data;
 
+  const [workoutItems, setWorkoutItems] = useState<ExerciseItemType[]>([]);
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
   const [openModal, setOpenModal] = useState(false);
+  const context = trpc.useContext();
+
+  useEffect(() => {
+    const myAsyncFunc = async () => {
+      const res = await context.fetchQuery([
+        "exercise.getWorkoutExercises",
+        { workoutId },
+      ]);
+      setWorkoutItems(res);
+    };
+    myAsyncFunc();
+  }, []);
+
+  const addExercise = async (id: number) => {
+    const res = await context.fetchQuery(["exercise.get", { id }]);
+    if (!res || !workoutItems) return;
+    setWorkoutItems((prev) => {
+      if (prev) {
+        return [...prev, res];
+      } else return [];
+    });
+  };
 
   return (
     <>
@@ -38,9 +62,9 @@ const WorkoutPage: NextPage = () => {
             </button>
           </Link>
         </div>
-        {workoutItem ? (
+        {workoutItems ? (
           <div ref={workoutsRef} className="flex flex-col gap-y-1 pt-3 w-4/5">
-            {workoutItem.map((exerciseItem, index) => {
+            {workoutItems.map((exerciseItem, index) => {
               if (!exerciseItem.ExerciseTemplate) return;
               const exerciseData = exerciseItem.ExerciseTemplate;
               const setsData = exerciseItem.ExerciseSets;
@@ -82,6 +106,7 @@ const WorkoutPage: NextPage = () => {
           userid={1}
           workoutid={workoutId}
           open={openModal}
+          addExercise={addExercise}
           closeModal={() => setOpenModal(false)}
         />
       </main>

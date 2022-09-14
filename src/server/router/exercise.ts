@@ -11,6 +11,10 @@ export const exercise = createRouter()
         where: {
           id: input.id,
         },
+        include: {
+          ExerciseTemplate: true,
+          ExerciseSets: true,
+        },
       });
     },
   })
