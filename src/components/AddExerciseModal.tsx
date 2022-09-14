@@ -2,7 +2,6 @@ import { Dialog, Transition, Combobox, Tab } from "@headlessui/react";
 import { ExerciseTemplate } from "@prisma/client";
 import { Fragment, useState } from "react";
 import { trpc } from "../utils/trpc";
-import { Exercise } from "@prisma/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSort, faCheck } from "@fortawesome/free-solid-svg-icons";
 

@@ -35,7 +35,7 @@ const WorkoutPage: NextPage = () => {
       setWorkoutItems(res);
     };
     myAsyncFunc();
-  }, []);
+  }, [context, workoutId]);
 
   const addExercise = async (id: number) => {
     const res = await context.fetchQuery(["exercise.get", { id }]);
