@@ -9,14 +9,15 @@ import { AddWorkoutModal } from "../../components/AddExerciseModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import { ExerciseSet } from "@prisma/client";
 
 const WorkoutPage: NextPage = () => {
   const router = useRouter();
   const { workout } = router.query;
   const workoutId = Number(workout);
   const workoutItem = trpc.useQuery([
-    "workout_ExerciseTemplate.getWorkoutExercises",
-    { workoutId: workoutId },
+    "exercise.getWorkoutExercises",
+    { workoutId },
   ]).data;
 
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
@@ -39,16 +40,20 @@ const WorkoutPage: NextPage = () => {
         </div>
         {workoutItem ? (
           <div ref={workoutsRef} className="flex flex-col gap-y-1 pt-3 w-4/5">
-            {workoutItem.map((workout_exercise, index) => {
-              const exercise = workout_exercise.ExerciseTemplate;
+            {workoutItem.map((exerciseItem, index) => {
+              if (!exerciseItem.ExerciseTemplate) return;
+              const exerciseData = exerciseItem.ExerciseTemplate;
+              const setsData = exerciseItem.ExerciseSets;
+              console.log(setsData);
               return (
                 <ExerciseItem
                   key={index}
-                  name={exercise.name}
-                  description={exercise.description ? exercise.description : ""}
-                  sets={exercise.sets}
-                  reps={exercise.reps}
-                  id={exercise.id}
+                  name={exerciseData.name}
+                  description={
+                    exerciseData.description ? exerciseData.description : ""
+                  }
+                  setsInfo={setsData}
+                  id={exerciseItem.id}
                 />
               );
             })}
@@ -89,16 +94,14 @@ export default WorkoutPage;
 type ExerciseItemProps = {
   name: string;
   description: string;
-  sets: number;
-  reps: number;
+  setsInfo: ExerciseSet[];
   id: number;
 };
 
 const ExerciseItem = ({
   name,
   description,
-  sets,
-  reps,
+  setsInfo,
   id,
 }: ExerciseItemProps) => {
   return (
@@ -120,7 +123,7 @@ const ExerciseItem = ({
             <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
               +
             </button>
-            <p className="p-1 hover:cursor-default">{sets}</p>
+            <p className="p-1 hover:cursor-default">{setsInfo[0]?.sets}</p>
             <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
               -
             </button>
@@ -132,7 +135,7 @@ const ExerciseItem = ({
             <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
               +
             </button>
-            <p className="p-1 hover:cursor-default">{reps}</p>
+            <p className="p-1 hover:cursor-default">{setsInfo[0]?.reps}</p>
             <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
               -
             </button>

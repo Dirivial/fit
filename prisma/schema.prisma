@@ -13,51 +13,47 @@ datasource db {
 }
 
 model User {
-    id                       Int                @id @default(autoincrement())
-    name                     String
-    email                    String
-    Workout                  Workout[]
-    CreatedExerciseTemplates ExerciseTemplate[]
+    id                Int                @id @default(autoincrement())
+    name              String
+    email             String
+    Workout           Workout[]
+    ExerciseTemplates ExerciseTemplate[]
 }
 
 model Workout {
-    id                       Int                        @id @default(autoincrement())
-    name                     String
-    description              String?
-    user                     User                       @relation(fields: [userId], references: [id])
-    userId                   Int
-    Workout_ExerciseTemplate Workout_ExerciseTemplate[]
+    id          Int        @id @default(autoincrement())
+    name        String
+    description String?
+    user        User       @relation(fields: [userId], references: [id])
+    userId      Int
+    Exercises   Exercise[]
 }
 
 model Exercise {
     id                 Int               @id @default(autoincrement())
-    sets               Int               @default(5)
-    reps               Int               @default(5)
-    weigth             Int               @default(0)
+    ExerciseSets       ExerciseSet[]
     date               DateTime?         @default(now())
     ExerciseTemplate   ExerciseTemplate? @relation(fields: [exerciseTemplateId], references: [id])
     exerciseTemplateId Int?
+    Workout            Workout?          @relation(fields: [workoutId], references: [id])
+    workoutId          Int?
+}
+
+model ExerciseSet {
+    id         Int       @id @default(autoincrement())
+    sets       Int       @default(5)
+    reps       Int       @default(5)
+    weigth     Int       @default(0)
+    Exercise   Exercise? @relation(fields: [exerciseId], references: [id])
+    exerciseId Int?
 }
 
 model ExerciseTemplate {
-    id                       Int                        @id @default(autoincrement())
-    User                     User?                      @relation(fields: [userId], references: [id])
-    userId                   Int?
-    Exercise                 Exercise[]
-    name                     String                     @unique
-    description              String
-    sets                     Int                        @default(5)
-    reps                     Int                        @default(5)
-    weigth                   Int                        @default(0)
-    restTime                 Int                        @default(120)
-    Workout_ExerciseTemplate Workout_ExerciseTemplate[]
-}
-
-model Workout_ExerciseTemplate {
-    workout            Workout          @relation(fields: [workoutId], references: [id])
-    workoutId          Int
-    ExerciseTemplate   ExerciseTemplate @relation(fields: [exerciseTemplateId], references: [id])
-    exerciseTemplateId Int
-
-    @@id([workoutId, exerciseTemplateId])
+    id          Int        @id @default(autoincrement())
+    User        User?      @relation(fields: [userId], references: [id])
+    userId      Int?
+    Exercise    Exercise[]
+    name        String
+    description String
+    type        String     @default("Weightlifing")
 }

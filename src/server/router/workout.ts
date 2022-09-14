@@ -11,7 +11,21 @@ export const workoutRouter = createRouter()
         where: {
           id: input.id,
         },
-        include: { Workout_ExerciseTemplate: true },
+        include: { Exercises: true },
+      });
+    },
+  })
+  .query("newFromTemplate", {
+    input: z.object({
+      id: z.number(),
+      templateId: z.number(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.workout.findFirst({
+        where: {
+          id: input.id,
+        },
+        include: { Exercises: true },
       });
     },
   })

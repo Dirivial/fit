@@ -14,6 +14,35 @@ export const exercise = createRouter()
       });
     },
   })
+  .query("create", {
+    input: z.object({
+      templateId: z.number(),
+      workoutId: z.number(),
+    }),
+    async resolve({ ctx, input }) {
+      const exercise = await ctx.prisma.exercise.create({
+        data: {
+          exerciseTemplateId: input.templateId,
+          workoutId: input.workoutId,
+        },
+      });
+      await ctx.prisma.exerciseSet.create({
+        data: { exerciseId: exercise.id },
+      });
+      return exercise;
+    },
+  })
+  .query("getWorkoutExercises", {
+    input: z.object({
+      workoutId: z.number(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.exercise.findMany({
+        where: { workoutId: input.workoutId },
+        include: { ExerciseTemplate: true, ExerciseSets: true },
+      });
+    },
+  })
   .query("getAll", {
     input: z.object({
       id: z.number(),
