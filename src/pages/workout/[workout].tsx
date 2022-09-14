@@ -24,6 +24,7 @@ const WorkoutPage: NextPage = () => {
   const [workoutItems, setWorkoutItems] = useState<ExerciseItemType[]>([]);
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
   const [openModal, setOpenModal] = useState(false);
+  const [waiting, setWaiting] = useState(true);
   const context = trpc.useContext();
 
   useEffect(() => {
@@ -33,13 +34,14 @@ const WorkoutPage: NextPage = () => {
         { workoutId },
       ]);
       setWorkoutItems(res);
+      setWaiting(false);
     };
     myAsyncFunc();
   }, [context, workoutId]);
 
   const addExercise = async (id: number) => {
     const res = await context.fetchQuery(["exercise.get", { id }]);
-    if (!res || !workoutItems) return;
+    if (!res) return;
     setWorkoutItems((prev) => {
       if (prev) {
         return [...prev, res];
@@ -62,31 +64,31 @@ const WorkoutPage: NextPage = () => {
             </button>
           </Link>
         </div>
-        {workoutItems ? (
-          <div ref={workoutsRef} className="flex flex-col gap-y-1 pt-3 w-4/5">
-            {workoutItems.map((exerciseItem, index) => {
-              if (!exerciseItem.ExerciseTemplate) return;
-              const exerciseData = exerciseItem.ExerciseTemplate;
-              const setsData = exerciseItem.ExerciseSets;
-              console.log(setsData);
-              return (
-                <ExerciseItem
-                  key={index}
-                  name={exerciseData.name}
-                  description={
-                    exerciseData.description ? exerciseData.description : ""
-                  }
-                  setsInfo={setsData}
-                  id={exerciseItem.id}
-                />
-              );
-            })}
-          </div>
-        ) : (
+        {waiting && (
           <div className="text-lg font-semibold text-violet-600 p-6">
             <FontAwesomeIcon icon={faSpinner} className="animate-spin w-10" />
           </div>
         )}
+
+        <div ref={workoutsRef} className="flex flex-col gap-y-1 pt-3 w-4/5">
+          {workoutItems.map((exerciseItem, index) => {
+            if (!exerciseItem.ExerciseTemplate) return;
+            const exerciseData = exerciseItem.ExerciseTemplate;
+            const setsData = exerciseItem.ExerciseSets;
+            console.log(setsData);
+            return (
+              <ExerciseItem
+                key={index}
+                name={exerciseData.name}
+                description={
+                  exerciseData.description ? exerciseData.description : ""
+                }
+                setsInfo={setsData}
+                id={exerciseItem.id}
+              />
+            );
+          })}
+        </div>
         <div className="p-2" />
         <div className="">
           <button
