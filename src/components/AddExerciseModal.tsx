@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSort, faCheck } from "@fortawesome/free-solid-svg-icons";
 
 type AddWorkoutModalProps = {
-  userid: number;
+  userid: string;
   workoutid: number;
   open: boolean;
   addExercise: (id: number) => void;
@@ -46,7 +46,7 @@ export const AddWorkoutModal = ({
       {
         name: name,
         description: desc,
-        userid: 1,
+        userid: userid,
       },
     ]);
     // Return this to workout so it can be added

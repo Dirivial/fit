@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { Exercise, ExerciseSet, ExerciseTemplate } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
 type ExerciseItemType = Exercise & {
   ExerciseTemplate: ExerciseTemplate | null;
@@ -26,6 +27,11 @@ const WorkoutPage: NextPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [waiting, setWaiting] = useState(true);
   const context = trpc.useContext();
+  const { data: session } = useSession();
+  const user = session?.user?.email
+    ? trpc.useQuery(["user.get", { email: session.user.email }]).data
+    : null;
+  console.log(user);
 
   useEffect(() => {
     const myAsyncFunc = async () => {
@@ -105,7 +111,7 @@ const WorkoutPage: NextPage = () => {
           </button>
         </Link>
         <AddWorkoutModal
-          userid={1}
+          userid={user ? user.id : ""}
           workoutid={workoutId}
           open={openModal}
           addExercise={addExercise}

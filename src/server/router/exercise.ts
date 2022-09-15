@@ -49,7 +49,7 @@ export const exercise = createRouter()
   })
   .query("getAll", {
     input: z.object({
-      id: z.number(),
+      id: z.string(),
     }),
     async resolve({ ctx, input }) {
       return await ctx.prisma.exerciseTemplate.findMany({

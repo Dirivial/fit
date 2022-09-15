@@ -16,7 +16,7 @@ export const exerciseTemplate = createRouter()
   })
   .query("create", {
     input: z.object({
-      userid: z.number(),
+      userid: z.string(),
       name: z.string(),
       description: z.string(),
     }),
@@ -32,7 +32,7 @@ export const exerciseTemplate = createRouter()
   })
   .query("getAll", {
     input: z.object({
-      id: z.number(),
+      id: z.string(),
     }),
     async resolve({ ctx, input }) {
       return await ctx.prisma.exerciseTemplate.findMany({

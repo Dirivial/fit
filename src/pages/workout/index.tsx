@@ -6,10 +6,45 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import HomeHeader from "../../components/homeHeader";
 import SetHead from "../../components/setHead";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { User, Workout } from "@prisma/client";
 
 const WorkoutListPage: NextPage = () => {
-  const workouts = trpc.useQuery(["workout.getAll", { id: 1 }]);
+  const { data: session } = useSession();
+  const test = trpc.useQuery([
+    "user.get",
+    { email: "alexander.kadeby@gmail.com" },
+  ]);
+  const context = trpc.useContext();
+  const [user, setUser] = useState<User>();
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      const email = session.user.email;
+      const getUser = async () => {
+        const res = await context.fetchQuery(["user.get", { email }]);
+        console.log(res);
+        setUser(res!);
+      };
+      getUser();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user?.id) {
+      const id = user.id;
+      const getWorkouts = async () => {
+        const res = await context.fetchQuery(["workout.getAll", { id }]);
+        if (res) {
+          setWorkouts(res);
+        }
+      };
+      getWorkouts();
+    }
+  }, [user]);
 
   return (
     <>
@@ -26,12 +61,12 @@ const WorkoutListPage: NextPage = () => {
             <Link href="/workout/free-form/">create</Link>
           </span>
         </h4>
-        {workouts.data ? (
+        {workouts ? (
           <div
             ref={workoutsRef}
             className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3"
           >
-            {workouts.data.map((thing, index) => {
+            {workouts.map((thing, index) => {
               return (
                 <WorkoutItem
                   key={index}

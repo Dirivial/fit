@@ -31,7 +31,7 @@ export const workoutRouter = createRouter()
   })
   .query("getAll", {
     input: z.object({
-      id: z.number(),
+      id: z.string(),
     }),
     async resolve({ ctx, input }) {
       return await ctx.prisma.workout.findMany({ where: { userId: input.id } });

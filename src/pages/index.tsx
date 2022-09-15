@@ -1,8 +1,11 @@
 import type { NextPage } from "next";
+import { useSession, signIn, signOut } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 
 const Home: NextPage = () => {
+  const { data: session } = useSession();
+  const test = "Gaming";
   return (
     <>
       <Head>
@@ -49,6 +52,16 @@ const Home: NextPage = () => {
             </Link>
           </section>
         </div>
+        {session ? (
+          <p>
+            Hi, {session.user ? session.user.email : "some user"}
+            <button onClick={() => signOut()}>Sign out</button>
+          </p>
+        ) : (
+          <p>
+            No user logged in<button onClick={() => signIn()}>Sign in</button>
+          </p>
+        )}
       </main>
     </>
   );

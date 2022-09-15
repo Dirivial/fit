@@ -1,15 +1,18 @@
 import { createRouter } from "./context";
 import { z } from "zod";
 
-export const exercise = createRouter().query("get", {
+export const user = createRouter().query("get", {
   input: z.object({
-    id: z.number(),
+    email: z.string(),
   }),
   async resolve({ ctx, input }) {
-    return await ctx.prisma.user.findFirst({
+    console.log("Fetching users with email: ", input.email);
+    const user = await ctx.prisma.user.findFirst({
       where: {
-        id: input.id,
+        email: input.email,
       },
     });
+    console.log(user);
+    return user;
   },
 });
