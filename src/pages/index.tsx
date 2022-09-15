@@ -67,9 +67,14 @@ const Home: NextPage = () => {
             </button>
           </p>
         ) : (
-          <p>
-            No user logged in<button onClick={() => signIn()}>Sign in</button>
-          </p>
+          <>
+            <p className="text-gray-200 text-lg">
+              Please sign in to use this site!{" "}
+            </p>
+            <button className="text-violet-400" onClick={() => signIn()}>
+              Sign in
+            </button>
+          </>
         )}
       </main>
     </>
