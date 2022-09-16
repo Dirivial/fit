@@ -11,6 +11,7 @@ import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { Exercise, ExerciseSet, ExerciseTemplate, User } from "@prisma/client";
 import { useSession } from "next-auth/react";
+import { ExerciseItem } from "../../components/ExerciseItem";
 
 type ExerciseItemType = Exercise & {
   ExerciseTemplate: ExerciseTemplate | null;
@@ -91,14 +92,12 @@ const WorkoutPage: NextPage = () => {
             if (!exerciseItem.ExerciseTemplate) return;
             const exerciseData = exerciseItem.ExerciseTemplate;
             const setsData = exerciseItem.ExerciseSets;
-            console.log(setsData);
+            //console.log(setsData);
             return (
               <ExerciseItem
                 key={index}
                 name={exerciseData.name}
-                description={
-                  exerciseData.description ? exerciseData.description : ""
-                }
+                description={exerciseData.description}
                 setsInfo={setsData}
                 id={exerciseItem.id}
               />
@@ -135,58 +134,3 @@ const WorkoutPage: NextPage = () => {
 };
 
 export default WorkoutPage;
-
-type ExerciseItemProps = {
-  name: string;
-  description: string;
-  setsInfo: ExerciseSet[];
-  id: number;
-};
-
-const ExerciseItem = ({
-  name,
-  description,
-  setsInfo,
-  id,
-}: ExerciseItemProps) => {
-  return (
-    <div className="flex sm:flex-row flex-col justify-end">
-      <section className="flex flex-row flex-grow justify-center border-2 border-pink-700 rounded shadow-xl">
-        <div className="p-6 flex-grow">
-          <h2 className="text-xl justify-start font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-700 via-pink-700 to-red-600">
-            {name}
-          </h2>
-          <div className="p-2" />
-          <p className="text-sm text-gray-200">{description}</p>
-        </div>
-      </section>
-      <div className="p-1" />
-      <section className="flex justify-around border-2 border-pink-700 rounded shadow-xl">
-        <div className="flex flex-col justify-center text-lg p-2 text-center text-gray-200">
-          <h3>Sets</h3>
-          <div className="flex">
-            <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
-              +
-            </button>
-            <p className="p-1 hover:cursor-default">{setsInfo[0]?.sets}</p>
-            <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
-              -
-            </button>
-          </div>
-        </div>
-        <div className="flex flex-col justify-center text-lg p-2 text-center text-gray-200">
-          <h3>Reps</h3>
-          <div className="flex">
-            <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
-              +
-            </button>
-            <p className="p-1 hover:cursor-default">{setsInfo[0]?.reps}</p>
-            <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
-              -
-            </button>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-};
