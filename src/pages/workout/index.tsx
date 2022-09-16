@@ -9,17 +9,16 @@ import SetHead from "../../components/setHead";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { User, Workout } from "@prisma/client";
+import { CreateWorkoutModal } from "../../components/CreateWorkoutModal";
 
 const WorkoutListPage: NextPage = () => {
   const { data: session } = useSession();
-  const test = trpc.useQuery([
-    "user.get",
-    { email: "alexander.kadeby@gmail.com" },
-  ]);
   const context = trpc.useContext();
   const [user, setUser] = useState<User>();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [loading, setLoading] = useState(true);
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -40,15 +39,30 @@ const WorkoutListPage: NextPage = () => {
         const res = await context.fetchQuery(["workout.getAll", { id }]);
         if (res) {
           setWorkouts(res);
+          setLoading(false);
         }
       };
       getWorkouts();
     }
   }, [user]);
 
+  const addWorkout = (workout: Workout) => {
+    console.log(workout);
+    setWorkouts((prev) => [...prev, workout]);
+  };
+
   return (
     <>
       <SetHead />
+
+      {user ? (
+        <CreateWorkoutModal
+          userid={user.id}
+          open={showModal}
+          addWorkout={addWorkout}
+          closeModal={() => setShowModal(false)}
+        />
+      ) : null}
 
       <main className="container mx-auto flex flex-col items-center min-h-screen p-4">
         <HomeHeader size="text-2xl" />
@@ -58,10 +72,10 @@ const WorkoutListPage: NextPage = () => {
         <h4 className="text-lg text-gray-200">
           or{" "}
           <span className="text-indigo-400">
-            <Link href="/workout/free-form/">create</Link>
+            <button onClick={() => setShowModal(true)}>create one!</button>
           </span>
         </h4>
-        {workouts ? (
+        {!loading ? (
           <div
             ref={workoutsRef}
             className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3"

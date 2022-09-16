@@ -15,17 +15,19 @@ export const workoutRouter = createRouter()
       });
     },
   })
-  .query("newFromTemplate", {
+  .query("create", {
     input: z.object({
-      id: z.number(),
-      templateId: z.number(),
+      name: z.string(),
+      description: z.string(),
+      userid: z.string(),
     }),
     async resolve({ ctx, input }) {
-      return await ctx.prisma.workout.findFirst({
-        where: {
-          id: input.id,
+      return await ctx.prisma.workout.create({
+        data: {
+          name: input.name,
+          description: input.description,
+          userId: input.userid,
         },
-        include: { Exercises: true },
       });
     },
   })
