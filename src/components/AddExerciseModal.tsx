@@ -64,6 +64,12 @@ export const AddWorkoutModal = ({
   };
 
   if (exercises.data) {
+    const filteredExercises =
+      query === ""
+        ? exercises.data
+        : exercises.data.filter((exercise) => {
+            return exercise.name.toLowerCase().includes(query.toLowerCase());
+          });
     return (
       <Transition appear show={open} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
@@ -90,7 +96,7 @@ export const AddWorkoutModal = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md border-2 border-pink-700 transform overflow-hidden rounded bg-slate-900 p-6 text-middle align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full h-fit max-w-md border-2 border-pink-700 transform overflow-visible rounded bg-slate-900 p-6 text-middle align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-200"
@@ -135,53 +141,55 @@ export const AddWorkoutModal = ({
                                 afterLeave={() => setQuery("")}
                               >
                                 <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-slate-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                  {exercises.data.length === 0 &&
+                                  {filteredExercises.length === 0 &&
                                   query !== "" ? (
                                     <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
                                       Nothing found.
                                     </div>
                                   ) : (
-                                    exercises.data.map((ExerciseTemplate) => (
-                                      <Combobox.Option
-                                        key={ExerciseTemplate.id}
-                                        className={({ active }) =>
-                                          `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                                            active
-                                              ? "bg-pink-600 text-gray-200"
-                                              : "text-gray-200"
-                                          }`
-                                        }
-                                        value={ExerciseTemplate}
-                                      >
-                                        {({ selected, active }) => (
-                                          <>
-                                            <span
-                                              className={`block truncate ${
-                                                selected
-                                                  ? "font-medium"
-                                                  : "font-normal"
-                                              }`}
-                                            >
-                                              {ExerciseTemplate.name}
-                                            </span>
-                                            {selected ? (
+                                    filteredExercises.map(
+                                      (ExerciseTemplate) => (
+                                        <Combobox.Option
+                                          key={ExerciseTemplate.id}
+                                          className={({ active }) =>
+                                            `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                                              active
+                                                ? "bg-pink-600 text-gray-200"
+                                                : "text-gray-200"
+                                            }`
+                                          }
+                                          value={ExerciseTemplate}
+                                        >
+                                          {({ selected, active }) => (
+                                            <>
                                               <span
-                                                className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                                                  active
-                                                    ? "text-white"
-                                                    : "text-gray-200"
+                                                className={`block truncate ${
+                                                  selected
+                                                    ? "font-medium"
+                                                    : "font-normal"
                                                 }`}
                                               >
-                                                <FontAwesomeIcon
-                                                  icon={faCheck}
-                                                  className="text-gray-200 w-5 h-5"
-                                                />
+                                                {ExerciseTemplate.name}
                                               </span>
-                                            ) : null}
-                                          </>
-                                        )}
-                                      </Combobox.Option>
-                                    ))
+                                              {selected ? (
+                                                <span
+                                                  className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                                                    active
+                                                      ? "text-white"
+                                                      : "text-gray-200"
+                                                  }`}
+                                                >
+                                                  <FontAwesomeIcon
+                                                    icon={faCheck}
+                                                    className="text-gray-200 w-5 h-5"
+                                                  />
+                                                </span>
+                                              ) : null}
+                                            </>
+                                          )}
+                                        </Combobox.Option>
+                                      )
+                                    )
                                   )}
                                 </Combobox.Options>
                               </Transition>

@@ -35,8 +35,11 @@ const WorkoutPage: NextPage = () => {
     const mail = session.user.email;
     const getUser = async () => {
       const res = await context.fetchQuery(["user.get", { email: mail }]);
-      if (res) setUser(res);
+      if (res) {
+        setUser(res);
+      }
     };
+    getUser();
   }, [session]);
 
   useEffect(() => {
@@ -117,13 +120,15 @@ const WorkoutPage: NextPage = () => {
             Initiate Workout
           </button>
         </Link>
-        <AddWorkoutModal
-          userid={user ? user.id : ""}
-          workoutid={workoutId}
-          open={openModal}
-          addExercise={addExercise}
-          closeModal={() => setOpenModal(false)}
-        />
+        {user?.id ? (
+          <AddWorkoutModal
+            userid={user.id}
+            workoutid={workoutId}
+            open={openModal}
+            addExercise={addExercise}
+            closeModal={() => setOpenModal(false)}
+          />
+        ) : null}
       </main>
     </>
   );
