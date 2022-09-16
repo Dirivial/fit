@@ -9,7 +9,7 @@ import { AddWorkoutModal } from "../../components/AddExerciseModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { Exercise, ExerciseSet, ExerciseTemplate } from "@prisma/client";
+import { Exercise, ExerciseSet, ExerciseTemplate, User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 
 type ExerciseItemType = Exercise & {
@@ -28,12 +28,19 @@ const WorkoutPage: NextPage = () => {
   const [waiting, setWaiting] = useState(true);
   const context = trpc.useContext();
   const { data: session } = useSession();
-  const user = session?.user?.email
-    ? trpc.useQuery(["user.get", { email: session.user.email }]).data
-    : null;
-  console.log(user);
+  const [user, setUser] = useState<User>();
 
   useEffect(() => {
+    if (!session?.user?.email) return;
+    const mail = session.user.email;
+    const getUser = async () => {
+      const res = await context.fetchQuery(["user.get", { email: mail }]);
+      if (res) setUser(res);
+    };
+  }, [session]);
+
+  useEffect(() => {
+    if (!workoutId) return;
     const myAsyncFunc = async () => {
       const res = await context.fetchQuery([
         "exercise.getWorkoutExercises",

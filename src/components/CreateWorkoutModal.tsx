@@ -75,16 +75,26 @@ export const CreateWorkoutModal = ({
                 </Dialog.Title>
 
                 <div className="pt-2 text-gray-300">
-                  <div>
-                    <label>What do you want to call the workout?</label>
+                  <div className="flex flex-col gap-2">
+                    <label className="">
+                      What do you want to call the workout?
+                    </label>
                     <input
+                      className="rounded bg-slate-900 border-2 border-pink-700 p-1"
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) => {
+                        if (e.target.value.length < 64) {
+                          setName(e.target.value);
+                        } else {
+                          console.log(
+                            "Trying to name a workout with a name longer than 64 characters"
+                          );
+                        }
+                      }}
                     />
-                  </div>
-                  <div>
-                    <label>Describe the workout</label>
+                    <label className="text-center">Describe the workout</label>
                     <input
+                      className="rounded bg-slate-900 border-2 border-pink-700 p-1"
                       value={desc}
                       onChange={(e) => setDesc(e.target.value)}
                     />

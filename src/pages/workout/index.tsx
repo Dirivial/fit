@@ -25,7 +25,6 @@ const WorkoutListPage: NextPage = () => {
       const email = session.user.email;
       const getUser = async () => {
         const res = await context.fetchQuery(["user.get", { email }]);
-        console.log(res);
         setUser(res!);
       };
       getUser();

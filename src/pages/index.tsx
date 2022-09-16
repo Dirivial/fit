@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const Home: NextPage = () => {
   const { data: session } = useSession();
-  const test = "Gaming";
+
   return (
     <>
       <Head>

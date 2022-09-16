@@ -3,7 +3,7 @@ import { ExerciseTemplate } from "@prisma/client";
 import { Fragment, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSort, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faSort, faCheck, faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 type AddWorkoutModalProps = {
   userid: string;
@@ -25,21 +25,25 @@ export const AddWorkoutModal = ({
   const [selected, setSelected] = useState<ExerciseTemplate>();
   const [query, setQuery] = useState("");
 
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
 
   const addExerciseFromTemplate = async () => {
-    if (!selected) return;
+    if (!selected) return; // Add some type of message to the user
+    setLoading(true);
     const res = await context.fetchQuery([
       "exercise.create",
       { workoutId: workoutid, templateId: selected.id },
     ]);
-    // Send result to [workout].tsx, it should then add the exercise to its workout list
-    addExercise(res.id);
+    addExercise(res.id); // Add to workout list
+    setLoading(false);
     closeModal();
   };
 
   const createExercise = async () => {
+    // Add some checks to make sure the name and description is okay
+    setLoading(true);
     // Create a new template, then add it to this workout
     const res = await context.fetchQuery([
       "exerciseTemplate.create",
@@ -54,6 +58,7 @@ export const AddWorkoutModal = ({
       "exercise.create",
       { workoutId: workoutid, templateId: res.id },
     ]);
+    setLoading(false);
     addExercise(res2.id);
     closeModal();
   };
@@ -93,9 +98,9 @@ export const AddWorkoutModal = ({
                     Add Exercise
                   </Dialog.Title>
                   <Tab.Group>
-                    <Tab.List>
-                      <Tab>Search</Tab>
-                      <Tab>Create</Tab>
+                    <Tab.List className="text-gray-200">
+                      <Tab className="p-1">Search</Tab>
+                      <Tab className="p-1">Create</Tab>
                     </Tab.List>
                     <Tab.Panels>
                       <Tab.Panel>
@@ -189,7 +194,7 @@ export const AddWorkoutModal = ({
                           <div className="mt-4">
                             <button
                               type="button"
-                              className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                              className="inline-flex justify-center rounded-md border border-transparent bg-pink-900 px-4 py-2 text-sm font-medium text-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                               onClick={closeModal}
                             >
                               Close
@@ -198,30 +203,49 @@ export const AddWorkoutModal = ({
                           <div className="mt-4">
                             <button
                               type="button"
-                              className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                              className="inline-flex justify-center rounded-md border border-transparent bg-indigo-900 px-4 py-2 text-sm font-medium text-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                               onClick={addExerciseFromTemplate}
                             >
-                              Save
+                              {loading ? (
+                                <div className="text-lg font-semibold text-grey-200 p-1">
+                                  <FontAwesomeIcon
+                                    icon={faSpinner}
+                                    className="animate-spin w-4"
+                                  />
+                                </div>
+                              ) : (
+                                <p>Save</p>
+                              )}
                             </button>
                           </div>
                         </div>
                       </Tab.Panel>
                       <Tab.Panel>
                         <div className="pt-2 text-gray-300">
-                          <div>
+                          <div className=" flex flex-col gap-2">
                             <label>Name</label>
                             <input
+                              className="rounded bg-slate-900 border-2 border-pink-700 p-1"
                               value={name}
-                              onChange={(e) => setName(e.target.value)}
+                              onChange={(e) => {
+                                if (e.target.value.length < 64) {
+                                  setName(e.target.value);
+                                } else {
+                                  // You should message the user
+                                  console.log(
+                                    "Trying to name an exercise with a name longer than 64 characters"
+                                  );
+                                }
+                              }}
                             />
-                          </div>
-                          <div>
                             <label>Description</label>
                             <input
+                              className="rounded bg-slate-900 border-2 border-pink-700 p-1"
                               value={desc}
                               onChange={(e) => setDesc(e.target.value)}
                             />
                           </div>
+
                           <div className="flex justify-between">
                             {" "}
                             <div className="mt-4">
@@ -239,7 +263,16 @@ export const AddWorkoutModal = ({
                                 className="inline-flex justify-center rounded-md border border-transparent bg-indigo-900 px-4 py-2 text-sm font-medium text-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                 onClick={createExercise}
                               >
-                                Save
+                                {loading ? (
+                                  <div className="text-lg font-semibold text-grey-200 p-1">
+                                    <FontAwesomeIcon
+                                      icon={faSpinner}
+                                      className="animate-spin w-4"
+                                    />
+                                  </div>
+                                ) : (
+                                  <p>Save</p>
+                                )}
                               </button>
                             </div>
                           </div>
