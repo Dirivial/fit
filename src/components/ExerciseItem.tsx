@@ -72,7 +72,7 @@ const SetList = ({ setsInfo, exerciseId }: SetListProps) => {
         <div className="p-2" />
         <h3>Rest</h3>
       </div>
-      <div ref={child} className="flex">
+      <div ref={child} className="flex overflow-x-scroll">
         {sets.map((set, index) => {
           return (
             <div
