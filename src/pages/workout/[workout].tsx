@@ -76,7 +76,7 @@ const WorkoutPage: NextPage = () => {
   const updateSets = (sets: ExerciseSet[], index: number) => {
     setWorkoutItems((prev) => {
       const next = [...prev];
-      let exercise = next[index];
+      const exercise = next[index];
       if (exercise?.ExerciseSets !== undefined) {
         exercise.ExerciseSets = sets;
         next[index] = exercise;

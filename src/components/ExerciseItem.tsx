@@ -2,7 +2,7 @@ import autoAnimate from "@formkit/auto-animate";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ExerciseSet } from "@prisma/client";
-import { useRef, useState, useEffect, useMemo } from "react";
+import { useRef, useState, useEffect } from "react";
 
 type ExerciseItemProps = {
   name: string;
@@ -94,8 +94,10 @@ const SetList = ({ setsInfo, exerciseId, updateSets }: SetListProps) => {
                 onChange={(e) =>
                   setSets((prev) => {
                     const next = [...prev];
-                    if (next[index]) {
-                      next[index]!.reps = getValidNumber(e.target.value);
+                    const item = next[index];
+                    if (item) {
+                      item.reps = getValidNumber(e.target.value);
+                      next[index] = item;
                     }
                     return next;
                   })
@@ -108,8 +110,10 @@ const SetList = ({ setsInfo, exerciseId, updateSets }: SetListProps) => {
                 onChange={(e) =>
                   setSets((prev) => {
                     const next = [...prev];
-                    if (next[index]) {
+                    const item = next[index];
+                    if (item) {
                       next[index]!.rest = getValidNumber(e.target.value);
+                      next[index] = item;
                     }
                     return next;
                   })
