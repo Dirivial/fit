@@ -2,12 +2,13 @@ import autoAnimate from "@formkit/auto-animate";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ExerciseSet } from "@prisma/client";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 
 type ExerciseItemProps = {
   name: string;
   description: string;
   setsInfo: ExerciseSet[];
+  updateSets: (sets: ExerciseSet[]) => void;
   id: number;
 };
 
@@ -15,6 +16,7 @@ export const ExerciseItem = ({
   name,
   description,
   setsInfo,
+  updateSets,
   id,
 }: ExerciseItemProps) => {
   const [show, setShow] = useState(false);
@@ -44,7 +46,9 @@ export const ExerciseItem = ({
         </div>
       </section>
 
-      {show && <SetList setsInfo={setsInfo} exerciseId={id} />}
+      {show && (
+        <SetList updateSets={updateSets} setsInfo={setsInfo} exerciseId={id} />
+      )}
     </div>
   );
 };
@@ -52,14 +56,19 @@ export const ExerciseItem = ({
 type SetListProps = {
   setsInfo: ExerciseSet[];
   exerciseId: number;
+  updateSets: (sets: ExerciseSet[]) => void;
 };
 
-const SetList = ({ setsInfo, exerciseId }: SetListProps) => {
+const SetList = ({ setsInfo, exerciseId, updateSets }: SetListProps) => {
   const [sets, setSets] = useState(setsInfo);
   const child = useRef(null);
   useEffect(() => {
     child.current && autoAnimate(child.current);
   }, [child]);
+
+  useEffect(() => {
+    updateSets(sets);
+  }, [sets]);
 
   const getValidNumber = (value: string) => {
     const val = Number(value);
@@ -119,8 +128,8 @@ const SetList = ({ setsInfo, exerciseId }: SetListProps) => {
                 reps: 5,
                 rest: 60,
                 weigth: 0,
-                exerciseId: exerciseId,
-                workoutExerciseId: null,
+                exerciseId: null,
+                workoutExerciseId: exerciseId,
               };
               return [...prev, newSet];
             })

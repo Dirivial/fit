@@ -73,6 +73,18 @@ const WorkoutPage: NextPage = () => {
     });
   };
 
+  const updateSets = (sets: ExerciseSet[], index: number) => {
+    setWorkoutItems((prev) => {
+      const next = [...prev];
+      let exercise = next[index];
+      if (exercise?.ExerciseSets !== undefined) {
+        exercise.ExerciseSets = sets;
+        next[index] = exercise;
+      }
+      return next;
+    });
+  };
+
   return (
     <>
       <SetHead />
@@ -112,6 +124,7 @@ const WorkoutPage: NextPage = () => {
                 name={exerciseData.name}
                 description={exerciseData.description}
                 setsInfo={setsData}
+                updateSets={(sets: ExerciseSet[]) => updateSets(sets, index)}
                 id={exerciseItem.id}
               />
             );
