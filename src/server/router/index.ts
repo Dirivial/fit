@@ -7,6 +7,7 @@ import { exercise } from "./exercise";
 import { exerciseTemplate } from "./exerciseTemplate";
 import { exerciseSets } from "./exerciseSets";
 import { user } from "./user";
+import { workoutExercise } from "./workoutExercise";
 
 export const appRouter = createRouter()
   .transformer(superjson)
@@ -14,7 +15,8 @@ export const appRouter = createRouter()
   .merge("exerciseTemplate.", exerciseTemplate)
   .merge("exercise.", exercise)
   .merge("exerciseSets.", exerciseSets)
-  .merge("user.", user);
+  .merge("user.", user)
+  .merge("workoutExercise.", workoutExercise);
 
 // export type definition of API
 export type AppRouter = typeof appRouter;

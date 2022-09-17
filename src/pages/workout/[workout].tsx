@@ -9,12 +9,17 @@ import { AddWorkoutModal } from "../../components/AddExerciseModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { Exercise, ExerciseSet, ExerciseTemplate, User } from "@prisma/client";
+import {
+  ExerciseSet,
+  ExerciseTemplate,
+  User,
+  WorkoutExercise,
+} from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { ExerciseItem } from "../../components/ExerciseItem";
 
-type ExerciseItemType = Exercise & {
-  ExerciseTemplate: ExerciseTemplate | null;
+type ExerciseItemType = WorkoutExercise & {
+  ExerciseTemplate: ExerciseTemplate;
   ExerciseSets: ExerciseSet[];
 };
 
@@ -49,7 +54,7 @@ const WorkoutPage: NextPage = () => {
     if (!workoutId) return;
     const myAsyncFunc = async () => {
       const res = await context.fetchQuery([
-        "exercise.getWorkoutExercises",
+        "workoutExercise.getWorkoutExercises",
         { workoutId },
       ]);
       setWorkoutItems(res);
@@ -59,7 +64,7 @@ const WorkoutPage: NextPage = () => {
   }, [context, workoutId]);
 
   const addExercise = async (id: number) => {
-    const res = await context.fetchQuery(["exercise.get", { id }]);
+    const res = await context.fetchQuery(["workoutExercise.get", { id }]);
     if (!res) return;
     setWorkoutItems((prev) => {
       if (prev) {
@@ -76,18 +81,17 @@ const WorkoutPage: NextPage = () => {
         <HomeHeader size="text-2xl" />
 
         <div className="p-6" />
-        <div className="flex gap-x-10 justify-around">
+        <h3 className="sm:text-2xl sm:p-2 text-lg font-bold text-gray-200">
+          {name}
+        </h3>
+        <div className="flex sm:flex-row flex-col sm:gap-x-24 gap-x-2 gap-y-2 justify-around">
           <Link href={`/workout`}>
-            <button className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
+            <button className="p-2 w-24 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
               Back
             </button>
           </Link>
 
-          <h3 className="sm:text-2xl sm:p-2 text-lg font-bold text-gray-200">
-            {name}
-          </h3>
-
-          <button className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
+          <button className="p-2 w-24 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
             Delete
           </button>
         </div>

@@ -59,40 +59,57 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
+// For creating a workout
 model Workout {
-    id          Int        @id @default(autoincrement())
-    name        String     @db.VarChar(64)
-    description String?    @db.Text
-    user        User       @relation(fields: [userId], references: [id])
-    userId      String
-    Exercises   Exercise[]
+    id            Int               @id @default(autoincrement())
+    name          String            @db.VarChar(64)
+    description   String?           @db.Text
+    lastPerformed DateTime          @default(now())
+    user          User              @relation(fields: [userId], references: [id])
+    userId        String
+    Exercises     WorkoutExercise[]
 }
 
+// The exercises a workout consists of
+model WorkoutExercise {
+    id                 Int              @id @default(autoincrement())
+    position           Int              @default(0)
+    ExerciseSets       ExerciseSet[]
+    ExerciseTemplate   ExerciseTemplate @relation(fields: [exerciseTemplateId], references: [id])
+    exerciseTemplateId Int
+    Workout            Workout?         @relation(fields: [workoutId], references: [id])
+    workoutId          Int?
+}
+
+// An exercise
 model Exercise {
     id                 Int               @id @default(autoincrement())
     ExerciseSets       ExerciseSet[]
     date               DateTime?         @default(now())
     ExerciseTemplate   ExerciseTemplate? @relation(fields: [exerciseTemplateId], references: [id])
     exerciseTemplateId Int?
-    Workout            Workout?          @relation(fields: [workoutId], references: [id])
-    workoutId          Int?
 }
 
+// The exercises
 model ExerciseSet {
-    id         Int       @id @default(autoincrement())
-    reps       Int       @default(5)
-    weigth     Int       @default(0)
-    rest       Int       @default(60)
-    Exercise   Exercise? @relation(fields: [exerciseId], references: [id])
-    exerciseId Int?
+    id                Int              @id @default(autoincrement())
+    reps              Int              @default(5)
+    weigth            Int              @default(0)
+    rest              Int              @default(60)
+    Exercise          Exercise?        @relation(fields: [exerciseId], references: [id])
+    exerciseId        Int?
+    WorkoutExercise   WorkoutExercise? @relation(fields: [workoutExerciseId], references: [id])
+    workoutExerciseId Int?
 }
 
+// This is mostly to make searching for a specific way easier (when analyzing)
 model ExerciseTemplate {
-    id          Int        @id @default(autoincrement())
-    User        User       @relation(fields: [userId], references: [id])
-    userId      String
-    Exercise    Exercise[]
-    name        String     @db.VarChar(64)
-    description String     @db.Text
-    type        String     @default("Weightlifing")
+    id              Int               @id @default(autoincrement())
+    User            User              @relation(fields: [userId], references: [id])
+    userId          String
+    Exercise        Exercise[]
+    name            String            @db.VarChar(64)
+    description     String            @db.Text
+    type            String            @default("Weightlifing")
+    WorkoutExercise WorkoutExercise[]
 }

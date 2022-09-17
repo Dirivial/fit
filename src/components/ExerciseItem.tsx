@@ -120,6 +120,7 @@ const SetList = ({ setsInfo, exerciseId }: SetListProps) => {
                 rest: 60,
                 weigth: 0,
                 exerciseId: exerciseId,
+                workoutExerciseId: null,
               };
               return [...prev, newSet];
             })

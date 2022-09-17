@@ -33,7 +33,7 @@ export const AddWorkoutModal = ({
     if (!selected) return; // Add some type of message to the user
     setLoading(true);
     const res = await context.fetchQuery([
-      "exercise.create",
+      "workoutExercise.create",
       { workoutId: workoutid, templateId: selected.id },
     ]);
     addExercise(res.id); // Add to workout list
@@ -55,7 +55,7 @@ export const AddWorkoutModal = ({
     ]);
     // Return this to workout so it can be added
     const res2 = await context.fetchQuery([
-      "exercise.create",
+      "workoutExercise.create",
       { workoutId: workoutid, templateId: res.id },
     ]);
     setLoading(false);
