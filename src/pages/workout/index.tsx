@@ -46,7 +46,6 @@ const WorkoutListPage: NextPage = () => {
   }, [user]);
 
   const addWorkout = (workout: Workout) => {
-    console.log(workout);
     setWorkouts((prev) => [...prev, workout]);
   };
 
