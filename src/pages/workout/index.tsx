@@ -111,7 +111,7 @@ type WorkoutItemProps = {
 const WorkoutItem = ({ name, description, id }: WorkoutItemProps) => {
   return (
     <section className="flex flex-col justify-center duration-500 border-2 border-pink-700 rounded shadow-xl motion-safe:hover:scale-105">
-      <Link href={`/workout/${id}`}>
+      <Link href={`/workout/id=${id}&name=${name}`}>
         <div className="p-6 cursor-pointer flex-grow">
           <h2 className="text-xl justify-start font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-700 to-red-600">
             {name}

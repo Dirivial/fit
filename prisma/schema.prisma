@@ -80,9 +80,9 @@ model Exercise {
 
 model ExerciseSet {
     id         Int       @id @default(autoincrement())
-    sets       Int       @default(5)
     reps       Int       @default(5)
     weigth     Int       @default(0)
+    rest       Int       @default(60)
     Exercise   Exercise? @relation(fields: [exerciseId], references: [id])
     exerciseId Int?
 }

@@ -21,7 +21,9 @@ type ExerciseItemType = Exercise & {
 const WorkoutPage: NextPage = () => {
   const router = useRouter();
   const { workout } = router.query;
-  const workoutId = Number(workout);
+  console.log(workout);
+  const workoutId = Number(workout?.slice(3, workout?.indexOf("&")));
+  const name = workout ? workout.slice(workout?.indexOf("name=") + 5) : "";
 
   const [workoutItems, setWorkoutItems] = useState<ExerciseItemType[]>([]);
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
@@ -74,12 +76,20 @@ const WorkoutPage: NextPage = () => {
         <HomeHeader size="text-2xl" />
 
         <div className="p-6" />
-        <div className="flex gap-x-10">
+        <div className="flex gap-x-10 justify-around">
           <Link href={`/workout`}>
             <button className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
               Back
             </button>
           </Link>
+
+          <h3 className="sm:text-2xl sm:p-2 text-lg font-bold text-gray-200">
+            {name}
+          </h3>
+
+          <button className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
+            Delete
+          </button>
         </div>
         {waiting && (
           <div className="text-lg font-semibold text-violet-600 p-6">
@@ -92,7 +102,6 @@ const WorkoutPage: NextPage = () => {
             if (!exerciseItem.ExerciseTemplate) return;
             const exerciseData = exerciseItem.ExerciseTemplate;
             const setsData = exerciseItem.ExerciseSets;
-            //console.log(setsData);
             return (
               <ExerciseItem
                 key={index}

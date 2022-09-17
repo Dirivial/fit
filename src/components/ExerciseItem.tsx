@@ -1,4 +1,6 @@
 import autoAnimate from "@formkit/auto-animate";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ExerciseSet } from "@prisma/client";
 import { useRef, useState, useEffect } from "react";
 
@@ -42,34 +44,91 @@ export const ExerciseItem = ({
         </div>
       </section>
 
-      {show && (
-        <section className="flex justify-around rounded shadow-xl">
-          <div className="flex flex-col justify-center text-lg p-2 text-center text-gray-200">
-            <h3>Sets</h3>
-            <div className="flex">
-              <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
-                +
-              </button>
-              <p className="p-1 hover:cursor-default">{setsInfo[0]?.sets}</p>
-              <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
-                -
-              </button>
-            </div>
-          </div>
-          <div className="flex flex-col justify-center text-lg p-2 text-center text-gray-200">
-            <h3>Reps</h3>
-            <div className="flex">
-              <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
-                +
-              </button>
-              <p className="p-1 hover:cursor-default">{setsInfo[0]?.reps}</p>
-              <button className="p-1 rounded-full text-indigo-500 duration-300 motion-safe:hover:scale-150">
-                -
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
+      {show && <SetList setsInfo={setsInfo} exerciseId={id} />}
     </div>
+  );
+};
+
+type SetListProps = {
+  setsInfo: ExerciseSet[];
+  exerciseId: number;
+};
+
+const SetList = ({ setsInfo, exerciseId }: SetListProps) => {
+  const [sets, setSets] = useState(setsInfo);
+  const child = useRef(null);
+  useEffect(() => {
+    child.current && autoAnimate(child.current);
+  }, [child]);
+
+  const getValidNumber = (value: string) => {
+    const val = Number(value);
+    return val < 1000 ? (val > -1 ? val : 0) : 999;
+  };
+  return (
+    <section className="flex justify-start rounded shadow-xl">
+      <div className="flex flex-col justify-center text-lg p-2 text-center text-gray-200">
+        <h3>Reps</h3>
+        <div className="p-2" />
+        <h3>Rest</h3>
+      </div>
+      <div ref={child} className="flex">
+        {sets.map((set, index) => {
+          return (
+            <div
+              key={index}
+              className="flex flex-col justify-center text-lg p-2 text-center text-gray-200"
+            >
+              <input
+                className="p-1 hover:cursor-default w-12 bg-transparent border-2 border-pink-700 rounded"
+                value={set.reps}
+                onChange={(e) =>
+                  setSets((prev) => {
+                    const next = [...prev];
+                    if (next[index]) {
+                      next[index]!.reps = getValidNumber(e.target.value);
+                    }
+                    return next;
+                  })
+                }
+              />
+              <div className="p-1" />
+              <input
+                className="p-1 hover:cursor-default w-12 bg-transparent border-2 border-pink-700 rounded"
+                value={set.rest}
+                onChange={(e) =>
+                  setSets((prev) => {
+                    const next = [...prev];
+                    if (next[index]) {
+                      next[index]!.rest = getValidNumber(e.target.value);
+                    }
+                    return next;
+                  })
+                }
+              />
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex flex-col justify-center">
+        <button
+          onClick={() =>
+            setSets((prev) => {
+              const newSet: ExerciseSet = {
+                id: 0,
+                reps: 5,
+                rest: 60,
+                weigth: 0,
+                exerciseId: exerciseId,
+              };
+              return [...prev, newSet];
+            })
+          }
+          className="border-2 rounded border-pink-700 text-gray-200 p-1 h-10"
+        >
+          <FontAwesomeIcon icon={faPlus} className="w-6" />
+        </button>
+      </div>
+    </section>
   );
 };
