@@ -8,7 +8,7 @@ type ExerciseItemProps = {
   name: string;
   description: string;
   setsInfo: ExerciseSet[];
-  updateSets: (sets: ExerciseSet[]) => void;
+  updateSets: (sets: ExerciseSet[], changed: boolean) => void;
   id: number;
 };
 
@@ -21,12 +21,31 @@ export const ExerciseItem = ({
 }: ExerciseItemProps) => {
   const [show, setShow] = useState(false);
   const parent = useRef(null);
+  const [updatedSets, setUpdatedSets] = useState<ExerciseSet[]>(setsInfo);
+  const [changed, setChanged] = useState<boolean>(false);
+
+  const updateSet = (aSet: ExerciseSet, index: number) => {
+    setChanged(true);
+    setUpdatedSets((prev) => {
+      const newSets = [...prev];
+      if (newSets.length <= index) {
+        newSets.push(aSet);
+        return newSets;
+      }
+      newSets[index] = aSet;
+      return newSets;
+    });
+  };
 
   useEffect(() => {
     parent.current && autoAnimate(parent.current);
   }, [parent]);
 
-  const reveal = () => setShow(!show);
+  const reveal = () => {
+    setShow(!show);
+    updateSets(updatedSets, changed);
+    setChanged(false);
+  };
 
   return (
     <div
@@ -47,7 +66,7 @@ export const ExerciseItem = ({
       </section>
 
       {show && (
-        <SetList updateSets={updateSets} setsInfo={setsInfo} exerciseId={id} />
+        <SetList updateSet={updateSet} setsInfo={setsInfo} exerciseId={id} />
       )}
     </div>
   );
@@ -56,19 +75,16 @@ export const ExerciseItem = ({
 type SetListProps = {
   setsInfo: ExerciseSet[];
   exerciseId: number;
-  updateSets: (sets: ExerciseSet[]) => void;
+  updateSet: (aSet: ExerciseSet, index: number) => void;
 };
 
-const SetList = ({ setsInfo, exerciseId, updateSets }: SetListProps) => {
+const SetList = ({ setsInfo, exerciseId, updateSet }: SetListProps) => {
   const [sets, setSets] = useState(setsInfo);
   const child = useRef(null);
+
   useEffect(() => {
     child.current && autoAnimate(child.current);
   }, [child]);
-
-  useEffect(() => {
-    updateSets(sets);
-  }, [sets]);
 
   const getValidNumber = (value: string) => {
     const val = Number(value);
@@ -91,33 +107,40 @@ const SetList = ({ setsInfo, exerciseId, updateSets }: SetListProps) => {
               <input
                 className="p-1 hover:cursor-default w-12 bg-transparent border-2 border-pink-700 rounded"
                 value={set.reps}
-                onChange={(e) =>
+                onChange={(e) => {
+                  let newSet = null;
+
                   setSets((prev) => {
                     const next = [...prev];
                     const item = next[index];
                     if (item) {
                       item.reps = getValidNumber(e.target.value);
                       next[index] = item;
+                      newSet = item;
                     }
                     return next;
-                  })
-                }
+                  });
+                  if (newSet) updateSet(newSet, index);
+                }}
               />
               <div className="p-1" />
               <input
                 className="p-1 hover:cursor-default w-12 bg-transparent border-2 border-pink-700 rounded"
                 value={set.rest}
-                onChange={(e) =>
+                onChange={(e) => {
+                  let newSet = null;
                   setSets((prev) => {
                     const next = [...prev];
                     const item = next[index];
                     if (item) {
                       next[index]!.rest = getValidNumber(e.target.value);
                       next[index] = item;
+                      newSet = item;
                     }
                     return next;
-                  })
-                }
+                  });
+                  if (newSet) updateSet(newSet, index);
+                }}
               />
             </div>
           );
@@ -125,19 +148,21 @@ const SetList = ({ setsInfo, exerciseId, updateSets }: SetListProps) => {
       </div>
       <div className="flex flex-col justify-center">
         <button
-          onClick={() =>
+          onClick={() => {
+            const newSet: ExerciseSet = {
+              id: 0,
+              reps: 5,
+              rest: 60,
+              weight: 0,
+              exerciseId: null,
+              workoutExerciseId: exerciseId,
+            };
+
+            updateSet(newSet, sets.length);
             setSets((prev) => {
-              const newSet: ExerciseSet = {
-                id: 0,
-                reps: 5,
-                rest: 60,
-                weigth: 0,
-                exerciseId: null,
-                workoutExerciseId: exerciseId,
-              };
               return [...prev, newSet];
-            })
-          }
+            });
+          }}
           className="border-2 rounded border-pink-700 text-gray-200 p-1 h-10"
         >
           <FontAwesomeIcon icon={faPlus} className="w-6" />

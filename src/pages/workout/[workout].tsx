@@ -8,7 +8,7 @@ import SetHead from "../../components/setHead";
 import { AddWorkoutModal } from "../../components/AddExerciseModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   ExerciseSet,
   ExerciseTemplate,
@@ -26,7 +26,6 @@ type ExerciseItemType = WorkoutExercise & {
 const WorkoutPage: NextPage = () => {
   const router = useRouter();
   const { workout } = router.query;
-  console.log(workout);
   const workoutId = Number(workout?.slice(3, workout?.indexOf("&")));
   const name = workout ? workout.slice(workout?.indexOf("name=") + 5) : "";
 
@@ -37,6 +36,7 @@ const WorkoutPage: NextPage = () => {
   const context = trpc.useContext();
   const { data: session } = useSession();
   const [user, setUser] = useState<User>();
+  const [setsToUpdate, setSetsToUpdate] = useState<number[]>([]);
 
   useEffect(() => {
     if (!session?.user?.email) return;
@@ -73,7 +73,8 @@ const WorkoutPage: NextPage = () => {
     });
   };
 
-  const updateSets = (sets: ExerciseSet[], index: number) => {
+  const updateSets = (sets: ExerciseSet[], changed: boolean, index: number) => {
+    if (!changed) return;
     setWorkoutItems((prev) => {
       const next = [...prev];
       const exercise = next[index];
@@ -82,6 +83,50 @@ const WorkoutPage: NextPage = () => {
         next[index] = exercise;
       }
       return next;
+    });
+    setsToUpdate.includes(index)
+      ? null
+      : setSetsToUpdate((prev) => [...prev, index]);
+  };
+
+  const createSet = async (item: ExerciseSet) => {
+    await context.fetchQuery([
+      "exerciseSets.create",
+      {
+        reps: item.reps,
+        rest: item.rest,
+        weight: item.weight,
+        workoutExerciseId: item.workoutExerciseId,
+      },
+    ]);
+    // TODO: Share the id given to the set
+  };
+
+  const sendSetsToUpdate = () => {
+    console.log(setsToUpdate);
+    const sets: ExerciseSet[] = [];
+
+    setsToUpdate.forEach((i) => {
+      let a = workoutItems[i];
+      if (a) {
+        sets.push(...a.ExerciseSets);
+      }
+    });
+
+    sets.forEach((item, index) => {
+      if (item.id > 0) {
+        context.fetchQuery([
+          "exerciseSets.update",
+          {
+            id: item.id,
+            reps: item.reps,
+            restTime: item.rest,
+            weight: item.weight,
+          },
+        ]);
+      } else {
+        createSet(item);
+      }
     });
   };
 
@@ -96,12 +141,20 @@ const WorkoutPage: NextPage = () => {
         <h3 className="sm:text-2xl sm:p-2 text-lg font-bold text-gray-200">
           {name}
         </h3>
+        <div className="p-3" />
         <div className="flex sm:flex-row flex-col sm:gap-x-24 gap-x-2 gap-y-2 justify-around">
           <Link href={`/workout`}>
             <button className="p-2 w-24 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
               Back
             </button>
           </Link>
+
+          <button
+            onClick={sendSetsToUpdate}
+            className="p-2 w-24 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105"
+          >
+            Save
+          </button>
 
           <button className="p-2 w-24 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
             Delete
@@ -124,7 +177,9 @@ const WorkoutPage: NextPage = () => {
                 name={exerciseData.name}
                 description={exerciseData.description}
                 setsInfo={setsData}
-                updateSets={(sets: ExerciseSet[]) => updateSets(sets, index)}
+                updateSets={(sets: ExerciseSet[], changed: boolean) =>
+                  updateSets(sets, changed, index)
+                }
                 id={exerciseItem.id}
               />
             );

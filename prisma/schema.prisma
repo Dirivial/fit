@@ -94,7 +94,7 @@ model Exercise {
 model ExerciseSet {
     id                Int              @id @default(autoincrement())
     reps              Int              @default(5)
-    weigth            Int              @default(0)
+    weight            Int              @default(0)
     rest              Int              @default(60)
     Exercise          Exercise?        @relation(fields: [exerciseId], references: [id])
     exerciseId        Int?
