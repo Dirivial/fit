@@ -107,7 +107,7 @@ const WorkoutPage: NextPage = () => {
     const sets: ExerciseSet[] = [];
 
     setsToUpdate.forEach((i) => {
-      let a = workoutItems[i];
+      const a = workoutItems[i];
       if (a) {
         sets.push(...a.ExerciseSets);
       }
