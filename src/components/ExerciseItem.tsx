@@ -1,5 +1,5 @@
 import autoAnimate from "@formkit/auto-animate";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ExerciseSet } from "@prisma/client";
 import { useRef, useState, useEffect } from "react";
@@ -9,6 +9,7 @@ type ExerciseItemProps = {
   description: string;
   setsInfo: ExerciseSet[];
   updateSets: (sets: ExerciseSet[], changed: boolean) => void;
+  updatePerformed: () => void;
   id: number;
 };
 
@@ -17,12 +18,14 @@ export const ExerciseItem = ({
   description,
   setsInfo,
   updateSets,
+  updatePerformed,
   id,
 }: ExerciseItemProps) => {
   const [show, setShow] = useState(false);
   const parent = useRef(null);
   const [updatedSets, setUpdatedSets] = useState<ExerciseSet[]>(setsInfo);
   const [changed, setChanged] = useState<boolean>(false);
+  const [exercisePerformed, setExercisePerformed] = useState(false);
 
   const updateSet = (aSet: ExerciseSet, index: number) => {
     setChanged(true);
@@ -47,27 +50,51 @@ export const ExerciseItem = ({
     setChanged(false);
   };
 
-  return (
-    <div
-      ref={parent}
-      className="flex flex-col border-2 border-pink-700 rounded"
-    >
-      <section
-        onClick={reveal}
-        className="flex flex-row flex-grow justify-center shadow-xl"
-      >
-        <div className="p-6 flex-grow">
-          <h2 className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-700 via-pink-700 to-red-600">
-            {name}
-          </h2>
-          <div className="p-2" />
-          <p className="text-sm text-gray-200">{description}</p>
-        </div>
-      </section>
+  const clickPerformed = () => {
+    setExercisePerformed((prev) => !prev);
+    updatePerformed();
+  };
 
-      {show && (
-        <SetList updateSet={updateSet} setsInfo={setsInfo} exerciseId={id} />
+  return (
+    <div className="flex flex-row items-center">
+      {exercisePerformed ? (
+        <button
+          onClick={clickPerformed}
+          className={"border-2 rounded border-pink-700 text-gray-200 p-1 h-10"}
+        >
+          <FontAwesomeIcon icon={faCheck} className="w-6" />
+        </button>
+      ) : (
+        <button
+          onClick={clickPerformed}
+          className={"border-2 rounded border-pink-700 text-gray-200 p-1 h-10"}
+        >
+          <div className="w-6" />
+        </button>
       )}
+
+      <div className="p-1" />
+      <div
+        ref={parent}
+        className="flex flex-col flex-grow border-2 border-pink-700 rounded"
+      >
+        <section
+          onClick={reveal}
+          className="flex flex-row flex-grow justify-center shadow-xl"
+        >
+          <div className="p-6 flex-grow">
+            <h2 className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-700 via-pink-700 to-red-600">
+              {name}
+            </h2>
+            <div className="p-2" />
+            <p className="text-sm text-gray-200">{description}</p>
+          </div>
+        </section>
+
+        {show && (
+          <SetList updateSet={updateSet} setsInfo={setsInfo} exerciseId={id} />
+        )}
+      </div>
     </div>
   );
 };
@@ -96,6 +123,8 @@ const SetList = ({ setsInfo, exerciseId, updateSet }: SetListProps) => {
         <h3>Reps</h3>
         <div className="p-2" />
         <h3>Rest</h3>
+        <div className="p-2" />
+        <h3>Weight</h3>
       </div>
       <div ref={child} className="flex overflow-x-scroll">
         {sets.map((set, index) => {
@@ -142,6 +171,24 @@ const SetList = ({ setsInfo, exerciseId, updateSet }: SetListProps) => {
                   if (newSet) updateSet(newSet, index);
                 }}
               />
+              <div className="p-1" />
+              <input
+                className="p-1 hover:cursor-default w-12 bg-transparent border-2 border-pink-700 rounded"
+                value={set.weight}
+                onChange={(e) => {
+                  let newSet = null;
+                  setSets((prev) => {
+                    const next = [...prev];
+                    newSet = next[index];
+                    if (newSet) {
+                      newSet.weight = getValidNumber(e.target.value);
+                      next[index] = newSet;
+                    }
+                    return next;
+                  });
+                  if (newSet) updateSet(newSet, index);
+                }}
+              />
             </div>
           );
         })}
@@ -166,6 +213,19 @@ const SetList = ({ setsInfo, exerciseId, updateSet }: SetListProps) => {
           className="border-2 rounded border-pink-700 text-gray-200 p-1 h-10"
         >
           <FontAwesomeIcon icon={faPlus} className="w-6" />
+        </button>
+        <div className="p-1" />
+        <button
+          onClick={() => {
+            setSets((prev) => {
+              const sets = [...prev];
+              sets.pop();
+              return sets;
+            });
+          }}
+          className="border-2 rounded border-pink-700 text-gray-200 p-1 h-10"
+        >
+          <FontAwesomeIcon icon={faMinus} className="w-6" />
         </button>
       </div>
     </section>

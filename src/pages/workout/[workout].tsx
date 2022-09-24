@@ -37,6 +37,8 @@ const WorkoutPage: NextPage = () => {
   const { data: session } = useSession();
   const [user, setUser] = useState<User>();
   const [setsToUpdate, setSetsToUpdate] = useState<number[]>([]);
+  const [changesMade, setChangesMade] = useState(false);
+  const [performedExercises, setPerformedExercises] = useState<number[]>([]);
 
   useEffect(() => {
     if (!session?.user?.email) return;
@@ -75,6 +77,7 @@ const WorkoutPage: NextPage = () => {
 
   const updateSets = (sets: ExerciseSet[], changed: boolean, index: number) => {
     if (!changed) return;
+    setChangesMade(true);
     setWorkoutItems((prev) => {
       const next = [...prev];
       const exercise = next[index];
@@ -103,7 +106,8 @@ const WorkoutPage: NextPage = () => {
   };
 
   const sendSetsToUpdate = () => {
-    console.log(setsToUpdate);
+    if (!changesMade) return;
+    setChangesMade(false);
     const sets: ExerciseSet[] = [];
 
     setsToUpdate.forEach((i) => {
@@ -130,6 +134,26 @@ const WorkoutPage: NextPage = () => {
     });
   };
 
+  const performExercise = (i: number) => {
+    if (performedExercises.includes(i)) {
+      setPerformedExercises((prev) => {
+        return prev.filter((v) => v !== i);
+      });
+    } else {
+      setPerformedExercises((prev) => {
+        return [...prev, i];
+      });
+    }
+  };
+
+  const logPerformedExercises = () => {
+    if (performedExercises.length === 0) {
+      console.log("You need to select the exercises you performed");
+      return;
+    }
+    console.log("These exercises should be logged", performedExercises);
+  };
+
   return (
     <>
       <SetHead />
@@ -151,9 +175,12 @@ const WorkoutPage: NextPage = () => {
 
           <button
             onClick={sendSetsToUpdate}
-            className="p-2 w-24 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105"
+            className={
+              "p-2 w-42 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105" +
+              (changesMade ? " bg-slate-700" : " bg-transparent")
+            }
           >
-            Save
+            Save Changes
           </button>
 
           <button className="p-2 w-24 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
@@ -181,6 +208,7 @@ const WorkoutPage: NextPage = () => {
                   updateSets(sets, changed, index)
                 }
                 id={exerciseItem.id}
+                updatePerformed={() => performExercise(index)}
               />
             );
           })}
@@ -195,11 +223,12 @@ const WorkoutPage: NextPage = () => {
           </button>
         </div>
         <div className="p-2" />
-        <Link href="/workout">
-          <button className="p-3 font-bold border-2 border-pink-700 text-xl text-gray-200 rounded shadow-xl duration-500 motion-safe:hover:scale-105">
-            Initiate Workout
-          </button>
-        </Link>
+        <button
+          onClick={logPerformedExercises}
+          className="p-3 font-bold border-2 border-pink-700 text-xl text-gray-200 rounded shadow-xl duration-500 motion-safe:hover:scale-105"
+        >
+          Log Performed Exercises
+        </button>
         {user?.id ? (
           <AddWorkoutModal
             userid={user.id}
