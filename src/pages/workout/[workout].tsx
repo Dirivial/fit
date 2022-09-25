@@ -30,15 +30,13 @@ const WorkoutPage: NextPage = () => {
   const name = workout ? workout.slice(workout?.indexOf("name=") + 5) : "";
 
   const [workoutItems, setWorkoutItems] = useState<ExerciseItemType[]>([]);
-  const [beforeChanges, setBeforeChanges] = useState<ExerciseItemType[]>([]);
-
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
   const [openModal, setOpenModal] = useState(false);
   const [waiting, setWaiting] = useState(true);
   const context = trpc.useContext();
   const { data: session } = useSession();
   const [user, setUser] = useState<User>();
-  const [setsToUpdate, setSetsToUpdate] = useState<number[]>([]);
+  const [itemsToUpdate, setItemsToUpdate] = useState<number[]>([]);
   const [setsToDelete, setSetsToDelete] = useState<number[]>([]);
   const [changesMade, setChangesMade] = useState(false);
   const [performedExercises, setPerformedExercises] = useState<number[]>([]);
@@ -78,7 +76,7 @@ const WorkoutPage: NextPage = () => {
     });
   };
 
-  const updateSets = (sets: ExerciseSet[], changed: boolean, index: number) => {
+  const updateItem = (sets: ExerciseSet[], changed: boolean, index: number) => {
     if (!changed) return;
     setChangesMade(true);
     const workoutItem = workoutItems[index];
@@ -104,25 +102,22 @@ const WorkoutPage: NextPage = () => {
       }
       return next;
     });
-    setsToUpdate.includes(index)
+    itemsToUpdate.includes(index)
       ? null
-      : setSetsToUpdate((prev) => [...prev, index]);
+      : setItemsToUpdate((prev) => [...prev, index]);
   };
 
-  const createSet = async (item: ExerciseSet) => {
+  const updateSets = async (sets: ExerciseSet[]) => {
+    console.log("Updating: ", sets);
     await context.fetchQuery([
-      "exerciseSets.create",
+      "exerciseSets.spicy",
       {
-        reps: item.reps,
-        rest: item.rest,
-        weight: item.weight,
-        workoutExerciseId: item.workoutExerciseId,
+        sets,
       },
     ]);
   };
 
   const removeSets = async (ids: number[]) => {
-    console.log("Removing: ", ids);
     await context.fetchQuery([
       "exerciseSets.removeMany",
       {
@@ -131,34 +126,20 @@ const WorkoutPage: NextPage = () => {
     ]);
   };
 
-  const sendSetsToUpdate = () => {
+  const sendItemsToUpdate = () => {
     if (!changesMade) return;
     setChangesMade(false);
-    const sets: ExerciseSet[] = [];
+    const toUpdate: ExerciseSet[] = [];
 
-    setsToUpdate.forEach((i) => {
+    itemsToUpdate.forEach((i) => {
       const a = workoutItems[i];
       if (a) {
-        sets.push(...a.ExerciseSets);
+        toUpdate.push(...a.ExerciseSets);
       }
     });
 
-    sets.forEach((item, index) => {
-      if (item.id > 0) {
-        context.fetchQuery([
-          "exerciseSets.update",
-          {
-            id: item.id,
-            reps: item.reps,
-            restTime: item.rest,
-            weight: item.weight,
-          },
-        ]);
-      } else {
-        createSet(item);
-      }
-    });
-    removeSets(setsToDelete);
+    if (toUpdate.length > 0) updateSets(toUpdate);
+    if (setsToDelete.length > 0) removeSets(setsToDelete);
   };
 
   const performExercise = (i: number) => {
@@ -213,7 +194,7 @@ const WorkoutPage: NextPage = () => {
           </Link>
 
           <button
-            onClick={sendSetsToUpdate}
+            onClick={sendItemsToUpdate}
             className={
               "p-2 w-42 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105" +
               (changesMade ? " bg-slate-700" : " bg-transparent")
@@ -244,7 +225,7 @@ const WorkoutPage: NextPage = () => {
                 description={exerciseData.description}
                 setsInfo={setsData}
                 updateSets={(sets: ExerciseSet[], changed: boolean) =>
-                  updateSets(sets, changed, index)
+                  updateItem(sets, changed, index)
                 }
                 id={exerciseItem.id}
                 updatePerformed={() => performExercise(index)}

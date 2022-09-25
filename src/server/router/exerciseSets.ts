@@ -35,6 +35,46 @@ export const exerciseSets = createRouter()
       });
     },
   })
+  .query("spicy", {
+    input: z.object({
+      sets: z
+        .object({
+          id: z.number(),
+          rest: z.number(),
+          reps: z.number(),
+          weight: z.number(),
+          workoutExerciseId: z.number().nullish(),
+        })
+        .array(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.$transaction(
+        input.sets.map((aSet) => {
+          if (aSet.id > 0) {
+            return ctx.prisma.exerciseSet.update({
+              where: {
+                id: aSet.id,
+              },
+              data: {
+                reps: aSet.reps,
+                rest: aSet.rest,
+                weight: aSet.weight,
+              },
+            });
+          } else {
+            return ctx.prisma.exerciseSet.create({
+              data: {
+                reps: aSet.reps,
+                rest: aSet.rest,
+                weight: aSet.weight,
+                workoutExerciseId: aSet.workoutExerciseId,
+              },
+            });
+          }
+        })
+      );
+    },
+  })
   .query("remove", {
     input: z.object({
       id: z.number(),
