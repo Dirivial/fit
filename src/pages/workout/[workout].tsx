@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState, useMemo } from "react";
 import {
+  Exercise,
   ExerciseSet,
   ExerciseTemplate,
   User,
@@ -146,12 +147,25 @@ const WorkoutPage: NextPage = () => {
     }
   };
 
+  const logExercise = async (i: number) => {
+    const exercise = workoutItems[i];
+    if (exercise) {
+      const sets = exercise.ExerciseSets;
+      const res = await context.fetchQuery([
+        "exercise.log",
+        { templateId: exercise.exerciseTemplateId, sets: sets },
+      ]);
+      console.log(res);
+    }
+  };
+
   const logPerformedExercises = () => {
     if (performedExercises.length === 0) {
       console.log("You need to select the exercises you performed");
       return;
     }
     console.log("These exercises should be logged", performedExercises);
+    performedExercises.forEach((i) => logExercise(i));
   };
 
   return (
