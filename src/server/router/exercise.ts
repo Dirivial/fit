@@ -34,6 +34,26 @@ export const exercise = createRouter()
       return exercise;
     },
   })
+  .query("log", {
+    input: z.object({
+      templateId: z.number(),
+      sets: z.array(
+        z.object({ reps: z.number(), rest: z.number(), weight: z.number() })
+      ),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.exercise.create({
+        data: {
+          exerciseTemplateId: input.templateId,
+          ExerciseSets: {
+            createMany: {
+              data: [...input.sets],
+            },
+          },
+        },
+      });
+    },
+  })
   .query("getAll", {
     input: z.object({
       id: z.string(),
