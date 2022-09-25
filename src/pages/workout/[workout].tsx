@@ -119,7 +119,6 @@ const WorkoutPage: NextPage = () => {
         workoutExerciseId: item.workoutExerciseId,
       },
     ]);
-    // TODO: Share the id given to the set
   };
 
   const removeSets = async (ids: number[]) => {
