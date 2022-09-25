@@ -35,6 +35,32 @@ export const exerciseSets = createRouter()
       });
     },
   })
+  .query("remove", {
+    input: z.object({
+      id: z.number(),
+    }),
+    async resolve({ ctx, input }) {
+      return ctx.prisma.exerciseSet.delete({
+        where: {
+          id: input.id,
+        },
+      });
+    },
+  })
+  .query("removeMany", {
+    input: z.object({
+      ids: z.number().array(),
+    }),
+    async resolve({ ctx, input }) {
+      return ctx.prisma.exerciseSet.deleteMany({
+        where: {
+          id: {
+            in: input.ids,
+          },
+        },
+      });
+    },
+  })
   .query("create", {
     input: z.object({
       reps: z.number(),

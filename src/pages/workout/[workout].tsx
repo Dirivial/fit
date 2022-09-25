@@ -10,7 +10,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState, useMemo } from "react";
 import {
-  Exercise,
   ExerciseSet,
   ExerciseTemplate,
   User,
@@ -31,6 +30,8 @@ const WorkoutPage: NextPage = () => {
   const name = workout ? workout.slice(workout?.indexOf("name=") + 5) : "";
 
   const [workoutItems, setWorkoutItems] = useState<ExerciseItemType[]>([]);
+  const [beforeChanges, setBeforeChanges] = useState<ExerciseItemType[]>([]);
+
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
   const [openModal, setOpenModal] = useState(false);
   const [waiting, setWaiting] = useState(true);
@@ -38,6 +39,7 @@ const WorkoutPage: NextPage = () => {
   const { data: session } = useSession();
   const [user, setUser] = useState<User>();
   const [setsToUpdate, setSetsToUpdate] = useState<number[]>([]);
+  const [setsToDelete, setSetsToDelete] = useState<number[]>([]);
   const [changesMade, setChangesMade] = useState(false);
   const [performedExercises, setPerformedExercises] = useState<number[]>([]);
 
@@ -79,6 +81,20 @@ const WorkoutPage: NextPage = () => {
   const updateSets = (sets: ExerciseSet[], changed: boolean, index: number) => {
     if (!changed) return;
     setChangesMade(true);
+    const workoutItem = workoutItems[index];
+    if (workoutItem) {
+      let diff = workoutItem.ExerciseSets.length - sets.length;
+      console.log(diff);
+      while (diff > 0) {
+        const setToRemove =
+          workoutItem.ExerciseSets[workoutItem.ExerciseSets.length - diff]?.id;
+        console.log(setToRemove);
+        if (setToRemove && setToRemove > 0) {
+          setSetsToDelete((prev) => [...prev, setToRemove]);
+        }
+        diff--;
+      }
+    }
     setWorkoutItems((prev) => {
       const next = [...prev];
       const exercise = next[index];
@@ -104,6 +120,16 @@ const WorkoutPage: NextPage = () => {
       },
     ]);
     // TODO: Share the id given to the set
+  };
+
+  const removeSets = async (ids: number[]) => {
+    console.log("Removing: ", ids);
+    await context.fetchQuery([
+      "exerciseSets.removeMany",
+      {
+        ids,
+      },
+    ]);
   };
 
   const sendSetsToUpdate = () => {
@@ -133,6 +159,7 @@ const WorkoutPage: NextPage = () => {
         createSet(item);
       }
     });
+    removeSets(setsToDelete);
   };
 
   const performExercise = (i: number) => {
@@ -155,7 +182,6 @@ const WorkoutPage: NextPage = () => {
         "exercise.log",
         { templateId: exercise.exerciseTemplateId, sets: sets },
       ]);
-      console.log(res);
     }
   };
 

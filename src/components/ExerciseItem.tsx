@@ -40,12 +40,21 @@ export const ExerciseItem = ({
     });
   };
 
+  const removeSet = () => {
+    setChanged(true);
+    setUpdatedSets((prev) => {
+      const next = [...prev];
+      next.pop();
+      return next;
+    });
+  };
+
   useEffect(() => {
     parent.current && autoAnimate(parent.current);
   }, [parent]);
 
   const reveal = () => {
-    setShow(!show);
+    setShow((prev) => !prev);
     updateSets(updatedSets, changed);
     setChanged(false);
   };
@@ -92,7 +101,12 @@ export const ExerciseItem = ({
         </section>
 
         {show && (
-          <SetList updateSet={updateSet} setsInfo={setsInfo} exerciseId={id} />
+          <SetList
+            updateSet={updateSet}
+            setsInfo={setsInfo}
+            exerciseId={id}
+            removeSet={removeSet}
+          />
         )}
       </div>
     </div>
@@ -103,9 +117,15 @@ type SetListProps = {
   setsInfo: ExerciseSet[];
   exerciseId: number;
   updateSet: (aSet: ExerciseSet, index: number) => void;
+  removeSet: () => void;
 };
 
-const SetList = ({ setsInfo, exerciseId, updateSet }: SetListProps) => {
+const SetList = ({
+  setsInfo,
+  exerciseId,
+  updateSet,
+  removeSet,
+}: SetListProps) => {
   const [sets, setSets] = useState(setsInfo);
   const child = useRef(null);
 
@@ -222,6 +242,7 @@ const SetList = ({ setsInfo, exerciseId, updateSet }: SetListProps) => {
               sets.pop();
               return sets;
             });
+            removeSet();
           }}
           className="border-2 rounded border-pink-700 text-gray-200 p-1 h-10"
         >
