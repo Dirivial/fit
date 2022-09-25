@@ -82,11 +82,9 @@ const WorkoutPage: NextPage = () => {
     const workoutItem = workoutItems[index];
     if (workoutItem) {
       let diff = workoutItem.ExerciseSets.length - sets.length;
-      console.log(diff);
       while (diff > 0) {
         const setToRemove =
           workoutItem.ExerciseSets[workoutItem.ExerciseSets.length - diff]?.id;
-        console.log(setToRemove);
         if (setToRemove && setToRemove > 0) {
           setSetsToDelete((prev) => [...prev, setToRemove]);
         }
@@ -108,7 +106,6 @@ const WorkoutPage: NextPage = () => {
   };
 
   const updateSets = async (sets: ExerciseSet[]) => {
-    console.log("Updating: ", sets);
     await context.fetchQuery([
       "exerciseSets.spicy",
       {
@@ -170,7 +167,6 @@ const WorkoutPage: NextPage = () => {
       console.log("You need to select the exercises you performed");
       return;
     }
-    console.log("These exercises should be logged", performedExercises);
     performedExercises.forEach((i) => logExercise(i));
   };
 
