@@ -124,7 +124,7 @@ const SetList = ({
     return val < 1000 ? (val > -1 ? val : 0) : 999;
   };
   return (
-    <section className="flex flex-col sm:flex-row rounded shadow-xl sm:max-w-fit overflow-x-scroll">
+    <section className="flex flex-col sm:flex-row rounded shadow-xl overflow-x-scroll">
       <div className="flex-grow flex flex-col sm:flex-row justify-start">
         <div className="flex sm:flex-col flex-row justify-center gap-5 sm:gap-0 text-lg p-2 text-center text-gray-200">
           <h3>Reps</h3>
