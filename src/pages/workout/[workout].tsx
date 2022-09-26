@@ -39,7 +39,6 @@ const WorkoutPage: NextPage = () => {
   const [itemsToUpdate, setItemsToUpdate] = useState<number[]>([]);
   const [setsToDelete, setSetsToDelete] = useState<number[]>([]);
   const [changesMade, setChangesMade] = useState(false);
-  const [performedExercises, setPerformedExercises] = useState<number[]>([]);
 
   useEffect(() => {
     if (!session?.user?.email) return;
@@ -139,18 +138,6 @@ const WorkoutPage: NextPage = () => {
     if (setsToDelete.length > 0) removeSets(setsToDelete);
   };
 
-  const performExercise = (i: number) => {
-    if (performedExercises.includes(i)) {
-      setPerformedExercises((prev) => {
-        return prev.filter((v) => v !== i);
-      });
-    } else {
-      setPerformedExercises((prev) => {
-        return [...prev, i];
-      });
-    }
-  };
-
   const logExercise = async (i: number) => {
     const exercise = workoutItems[i];
     if (exercise) {
@@ -160,14 +147,6 @@ const WorkoutPage: NextPage = () => {
         { templateId: exercise.exerciseTemplateId, sets: sets },
       ]);
     }
-  };
-
-  const logPerformedExercises = () => {
-    if (performedExercises.length === 0) {
-      console.log("You need to select the exercises you performed");
-      return;
-    }
-    performedExercises.forEach((i) => logExercise(i));
   };
 
   return (
@@ -182,26 +161,12 @@ const WorkoutPage: NextPage = () => {
           {name}
         </h3>
         <div className="p-3" />
-        <div className="flex sm:flex-row flex-col sm:gap-x-24 gap-x-2 gap-y-2 justify-around">
+        <div className=" sm:gap-x-24 gap-x-2 gap-y-2 justify-around items-center">
           <Link href={`/workout`}>
             <button className="p-2 w-24 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
               Back
             </button>
           </Link>
-
-          <button
-            onClick={sendItemsToUpdate}
-            className={
-              "p-2 w-42 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105" +
-              (changesMade ? " bg-slate-700" : " bg-transparent")
-            }
-          >
-            Save Changes
-          </button>
-
-          <button className="p-2 w-24 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105">
-            Delete
-          </button>
         </div>
         {waiting && (
           <div className="text-lg font-semibold text-violet-600 p-6">
@@ -224,27 +189,27 @@ const WorkoutPage: NextPage = () => {
                   updateItem(sets, changed, index)
                 }
                 id={exerciseItem.id}
-                updatePerformed={() => performExercise(index)}
+                logExercise={() => logExercise(index)}
               />
             );
           })}
         </div>
         <div className="p-2" />
-        <div className="">
+        <div className="flex flex-col justify-center items-center gap-y-3">
           <button
             onClick={() => setOpenModal(true)}
             className="border-2 rounded border-pink-700 text-gray-200 p-1"
           >
-            <FontAwesomeIcon icon={faPlus} className="w-6" />
+            <FontAwesomeIcon icon={faPlus} className="w-6 h-6" />
+          </button>
+
+          <button
+            onClick={() => console.log("This should delete this workout")}
+            className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105"
+          >
+            Delete Workout
           </button>
         </div>
-        <div className="p-2" />
-        <button
-          onClick={logPerformedExercises}
-          className="p-3 font-bold border-2 border-pink-700 text-xl text-gray-200 rounded shadow-xl duration-500 motion-safe:hover:scale-105"
-        >
-          Log Performed Exercises
-        </button>
         {user?.id ? (
           <AddWorkoutModal
             userid={user.id}
