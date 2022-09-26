@@ -65,42 +65,36 @@ export const ExerciseItem = ({
   };
 
   return (
-    <div className="flex flex-row items-center">
-      <div className="p-1" />
-      <div
-        ref={parent}
-        className="flex flex-col flex-grow border-2 border-pink-700 rounded"
-      >
-        <section className="flex flex-grow justify-center shadow-xl">
-          <div onClick={reveal} className="p-6 flex-grow flex flex-row">
-            <h2 className="text-xl flex-grow font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-700 via-pink-700 to-red-600">
-              {name}
-            </h2>
-            <div className="p-4" />
-            <button
-              onClick={() => {
-                reveal();
-                console.log("Yo");
-              }}
-              className="absolute right-4"
-            >
-              <FontAwesomeIcon
-                icon={faInfo}
-                className="w-6 h-6 text-pink-500"
-              />
-            </button>
-          </div>
-        </section>
+    <div
+      ref={parent}
+      className="flex flex-col flex-grow border-2 border-pink-700 rounded"
+    >
+      <section className="flex flex-grow justify-center shadow-xl">
+        <div onClick={reveal} className="p-6 flex-grow flex flex-row">
+          <h2 className="text-xl flex-grow font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-700 via-pink-700 to-red-600">
+            {name}
+          </h2>
+          <div className="p-4" />
+          <button
+            onClick={() => {
+              reveal();
+              console.log("Yo");
+            }}
+            className="absolute right-4"
+          >
+            <FontAwesomeIcon icon={faInfo} className="w-6 h-6 text-pink-500" />
+          </button>
+        </div>
+      </section>
 
-        {show && (
-          <SetList
-            updateSet={updateSet}
-            setsInfo={setsInfo}
-            exerciseId={id}
-            removeSet={removeSet}
-          />
-        )}
-      </div>
+      {show && (
+        <SetList
+          updateSet={updateSet}
+          setsInfo={setsInfo}
+          exerciseId={id}
+          removeSet={removeSet}
+        />
+      )}
     </div>
   );
 };
@@ -130,7 +124,7 @@ const SetList = ({
     return val < 1000 ? (val > -1 ? val : 0) : 999;
   };
   return (
-    <section className="flex flex-col sm:flex-row rounded shadow-xl w-fit">
+    <section className="flex flex-col sm:flex-row rounded shadow-xl sm:max-w-fit overflow-x-scroll">
       <div className="flex-grow flex flex-col sm:flex-row justify-start">
         <div className="flex sm:flex-col flex-row justify-center gap-5 sm:gap-0 text-lg p-2 text-center text-gray-200">
           <h3>Reps</h3>
@@ -139,10 +133,7 @@ const SetList = ({
           <div className="p-2" />
           <h3>Weight</h3>
         </div>
-        <div
-          ref={child}
-          className="flex flex-col sm:flex-row overflow-x-scroll"
-        >
+        <div ref={child} className="flex flex-col sm:flex-row">
           {sets.map((set, index) => {
             return (
               <div
@@ -150,7 +141,7 @@ const SetList = ({
                 className="flex sm:flex-col flex-row justify-center gap-5 sm:gap-0 text-lg p-2 text-center text-gray-200"
               >
                 <input
-                  className="p-1 hover:cursor-default w-12 bg-transparent border-2 border-pink-700 rounded"
+                  className="p-1 w-12 bg-transparent border-2 border-pink-700 rounded"
                   value={set.reps}
                   onChange={(e) => {
                     let newSet = null;
@@ -170,7 +161,7 @@ const SetList = ({
                 />
                 <div className="p-1" />
                 <input
-                  className="p-1 hover:cursor-default w-12 bg-transparent border-2 border-pink-700 rounded"
+                  className="p-1 w-12 bg-transparent border-2 border-pink-700 rounded"
                   value={set.rest}
                   onChange={(e) => {
                     let newSet = null;
@@ -189,7 +180,7 @@ const SetList = ({
                 />
                 <div className="p-1" />
                 <input
-                  className="p-1 hover:cursor-default w-12 bg-transparent border-2 border-pink-700 rounded"
+                  className="p-1 w-12 bg-transparent border-2 border-pink-700 rounded"
                   value={set.weight}
                   onChange={(e) => {
                     let newSet = null;
