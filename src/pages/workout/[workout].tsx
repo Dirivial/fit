@@ -214,12 +214,12 @@ const WorkoutPage: NextPage = () => {
             <FontAwesomeIcon icon={faPlus} className="w-6 h-6" />
           </button>
 
-          <button
+          {/* <button
             onClick={() => deleteWorkout()}
             className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105"
           >
             Delete Workout
-          </button>
+          </button> */}
         </div>
         {user?.id ? (
           <AddWorkoutModal
