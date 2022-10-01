@@ -8,7 +8,7 @@ import SetHead from "../../components/setHead";
 import { AddWorkoutModal } from "../../components/AddExerciseModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import {
   ExerciseSet,
   ExerciseTemplate,
@@ -134,16 +134,24 @@ const WorkoutPage: NextPage = () => {
     updateSets(sets);
   };
 
+  const pleaseStop = () => {
+    console.log("This program has stopped working on my computer");
+    return;
+  };
+
   const deleteExercise = async (workoutExerciseId: number, index: number) => {
-    setWorkoutItems((prev) => {
-      const next = [...prev];
-      next.splice(index, 1);
-      return next;
-    });
-    const res = await context.fetchQuery([
-      "workoutExercise.delete",
-      { id: workoutExerciseId },
-    ]);
+    router.replace("/workout");
+    return;
+    console.log("WHASJKLÖDSJAKLDÖFASJKDSA");
+    // setWorkoutItems((prev) => {
+    //   const next = [...prev];
+    //   next.splice(index, 1);
+    //   return next;
+    // });
+    // const res = await context.fetchQuery([
+    //   "workoutExercise.delete",
+    //   { id: workoutExerciseId },
+    // ]);
   };
 
   return (
@@ -192,7 +200,7 @@ const WorkoutPage: NextPage = () => {
                 saveExercise={(sets: ExerciseSet[]) =>
                   saveExercise(sets, index)
                 }
-                deleteExercise={() => deleteExercise(exerciseItem.id, index)}
+                deleteExercise={() => pleaseStop()} //deleteExercise(exerciseItem.id, index)}
               />
             );
           })}
