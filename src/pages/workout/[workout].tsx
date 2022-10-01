@@ -67,6 +67,7 @@ const WorkoutPage: NextPage = () => {
       "workout.delete",
       { id: workoutId, workoutExerciseIds: workoutItems.map((i) => i.id) },
     ]);
+    router.replace("/workout");
   };
 
   const addExercise = async (id: number) => {
@@ -134,24 +135,16 @@ const WorkoutPage: NextPage = () => {
     updateSets(sets);
   };
 
-  const pleaseStop = () => {
-    console.log("This program has stopped working on my computer");
-    return;
-  };
-
   const deleteExercise = async (workoutExerciseId: number, index: number) => {
-    router.replace("/workout");
-    return;
-    console.log("WHASJKLÖDSJAKLDÖFASJKDSA");
-    // setWorkoutItems((prev) => {
-    //   const next = [...prev];
-    //   next.splice(index, 1);
-    //   return next;
-    // });
-    // const res = await context.fetchQuery([
-    //   "workoutExercise.delete",
-    //   { id: workoutExerciseId },
-    // ]);
+    setWorkoutItems((prev) => {
+      const next = [...prev];
+      next.splice(index, 1);
+      return next;
+    });
+    const res = await context.fetchQuery([
+      "workoutExercise.delete",
+      { id: workoutExerciseId },
+    ]);
   };
 
   return (
@@ -200,7 +193,7 @@ const WorkoutPage: NextPage = () => {
                 saveExercise={(sets: ExerciseSet[]) =>
                   saveExercise(sets, index)
                 }
-                deleteExercise={() => pleaseStop()} //deleteExercise(exerciseItem.id, index)}
+                deleteExercise={() => deleteExercise(exerciseItem.id, index)}
               />
             );
           })}
@@ -214,12 +207,12 @@ const WorkoutPage: NextPage = () => {
             <FontAwesomeIcon icon={faPlus} className="w-6 h-6" />
           </button>
 
-          {/* <button
+          <button
             onClick={() => deleteWorkout()}
             className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105"
           >
             Delete Workout
-          </button> */}
+          </button>
         </div>
         {user?.id ? (
           <AddWorkoutModal
