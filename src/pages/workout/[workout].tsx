@@ -62,6 +62,13 @@ const WorkoutPage: NextPage = () => {
     myAsyncFunc();
   }, [context, workoutId]);
 
+  const deleteWorkout = async () => {
+    const res = await context.fetchQuery([
+      "workout.delete",
+      { id: workoutId, workoutExerciseIds: workoutItems.map((i) => i.id) },
+    ]);
+  };
+
   const addExercise = async (id: number) => {
     const res = await context.fetchQuery(["workoutExercise.get", { id }]);
     if (!res) return;
@@ -200,7 +207,7 @@ const WorkoutPage: NextPage = () => {
           </button>
 
           <button
-            onClick={() => console.log("This should delete this workout")}
+            onClick={() => deleteWorkout()}
             className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105"
           >
             Delete Workout

@@ -15,6 +15,30 @@ export const workoutRouter = createRouter()
       });
     },
   })
+  .query("delete", {
+    input: z.object({
+      id: z.number(),
+      workoutExerciseIds: z.number().array(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.$transaction([
+        // Delete exercise sets
+        ctx.prisma.exerciseSet.deleteMany({
+          where: { workoutExerciseId: { in: input.workoutExerciseIds } },
+        }),
+        // Delete workout exercises
+        ctx.prisma.workoutExercise.deleteMany({
+          where: { id: { in: input.workoutExerciseIds } },
+        }),
+        // Finally delete the workout itself
+        ctx.prisma.workout.delete({
+          where: {
+            id: input.id,
+          },
+        }),
+      ]);
+    },
+  })
   .query("create", {
     input: z.object({
       name: z.string(),
