@@ -36,9 +36,6 @@ const WorkoutPage: NextPage = () => {
   const context = trpc.useContext();
   const { data: session } = useSession();
   const [user, setUser] = useState<User>();
-  const [itemsToUpdate, setItemsToUpdate] = useState<number[]>([]);
-  const [setsToDelete, setSetsToDelete] = useState<number[]>([]);
-  const [changesMade, setChangesMade] = useState(false);
 
   useEffect(() => {
     if (!session?.user?.email) return;
@@ -77,19 +74,7 @@ const WorkoutPage: NextPage = () => {
 
   const updateItem = (sets: ExerciseSet[], changed: boolean, index: number) => {
     if (!changed) return;
-    setChangesMade(true);
     const workoutItem = workoutItems[index];
-    if (workoutItem) {
-      let diff = workoutItem.ExerciseSets.length - sets.length;
-      while (diff > 0) {
-        const setToRemove =
-          workoutItem.ExerciseSets[workoutItem.ExerciseSets.length - diff]?.id;
-        if (setToRemove && setToRemove > 0) {
-          setSetsToDelete((prev) => [...prev, setToRemove]);
-        }
-        diff--;
-      }
-    }
     setWorkoutItems((prev) => {
       const next = [...prev];
       const exercise = next[index];
@@ -99,9 +84,6 @@ const WorkoutPage: NextPage = () => {
       }
       return next;
     });
-    itemsToUpdate.includes(index)
-      ? null
-      : setItemsToUpdate((prev) => [...prev, index]);
   };
 
   const updateSets = async (sets: ExerciseSet[]) => {
@@ -122,31 +104,39 @@ const WorkoutPage: NextPage = () => {
     ]);
   };
 
-  const sendItemsToUpdate = () => {
-    if (!changesMade) return;
-    setChangesMade(false);
-    const toUpdate: ExerciseSet[] = [];
-
-    itemsToUpdate.forEach((i) => {
-      const a = workoutItems[i];
-      if (a) {
-        toUpdate.push(...a.ExerciseSets);
-      }
-    });
-
-    if (toUpdate.length > 0) updateSets(toUpdate);
-    if (setsToDelete.length > 0) removeSets(setsToDelete);
+  const logExercise = async (
+    sets: ExerciseSet[],
+    exerciseTemplateId: number
+  ) => {
+    const res = await context.fetchQuery([
+      "exercise.log",
+      { templateId: exerciseTemplateId, sets: sets },
+    ]);
   };
 
-  const logExercise = async (i: number) => {
-    const exercise = workoutItems[i];
-    if (exercise) {
-      const sets = exercise.ExerciseSets;
-      const res = await context.fetchQuery([
-        "exercise.log",
-        { templateId: exercise.exerciseTemplateId, sets: sets },
-      ]);
+  const saveExercise = (sets: ExerciseSet[], i: number) => {
+    const item = workoutItems[i];
+    if (item && sets.length < item.ExerciseSets.length) {
+      const toRemove: number[] = [];
+      while (sets.length < item.ExerciseSets.length) {
+        const aSet = item.ExerciseSets.pop();
+        if (aSet) toRemove.push(aSet.id);
+      }
+      removeSets(toRemove);
     }
+    updateSets(sets);
+  };
+
+  const deleteExercise = async (workoutExerciseId: number, index: number) => {
+    setWorkoutItems((prev) => {
+      const next = [...prev];
+      next.splice(index, 1);
+      return next;
+    });
+    const res = await context.fetchQuery([
+      "workoutExercise.delete",
+      { id: workoutExerciseId },
+    ]);
   };
 
   return (
@@ -189,7 +179,13 @@ const WorkoutPage: NextPage = () => {
                   updateItem(sets, changed, index)
                 }
                 id={exerciseItem.id}
-                logExercise={() => logExercise(index)}
+                logExercise={(sets: ExerciseSet[]) =>
+                  logExercise(sets, exerciseData.id)
+                }
+                saveExercise={(sets: ExerciseSet[]) =>
+                  saveExercise(sets, index)
+                }
+                deleteExercise={() => deleteExercise(exerciseItem.id, index)}
               />
             );
           })}

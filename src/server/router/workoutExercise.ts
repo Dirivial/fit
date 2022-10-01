@@ -36,6 +36,22 @@ export const workoutExercise = createRouter()
       return exercise;
     },
   })
+  .query("delete", {
+    input: z.object({
+      id: z.number(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.$transaction([
+        ctx.prisma.exerciseSet.deleteMany({
+          where: { workoutExerciseId: input.id },
+        }),
+        ctx.prisma.workoutExercise.delete({
+          where: { id: input.id },
+          include: { ExerciseSets: true },
+        }),
+      ]);
+    },
+  })
   .query("getWorkoutExercises", {
     input: z.object({
       workoutId: z.number(),

@@ -1,10 +1,5 @@
 import autoAnimate from "@formkit/auto-animate";
-import {
-  faCaretDown,
-  faInfo,
-  faMinus,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faInfo, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ExerciseSet } from "@prisma/client";
 import { useRef, useState, useEffect } from "react";
@@ -14,7 +9,9 @@ type ExerciseItemProps = {
   description: string;
   setsInfo: ExerciseSet[];
   updateSets: (sets: ExerciseSet[], changed: boolean) => void;
-  logExercise: () => void;
+  logExercise: (sets: ExerciseSet[]) => void;
+  saveExercise: (sets: ExerciseSet[]) => void;
+  deleteExercise: () => void;
   id: number;
 };
 
@@ -24,13 +21,14 @@ export const ExerciseItem = ({
   setsInfo,
   updateSets,
   logExercise,
+  saveExercise,
+  deleteExercise,
   id,
 }: ExerciseItemProps) => {
   const [show, setShow] = useState(false);
   const parent = useRef(null);
   const [updatedSets, setUpdatedSets] = useState<ExerciseSet[]>(setsInfo);
   const [changed, setChanged] = useState<boolean>(false);
-  const [exercisePerformed, setExercisePerformed] = useState(false);
 
   const updateSet = (aSet: ExerciseSet, index: number) => {
     setChanged(true);
@@ -60,8 +58,10 @@ export const ExerciseItem = ({
 
   const reveal = () => {
     setShow((prev) => !prev);
-    updateSets(updatedSets, changed);
-    setChanged(false);
+    if (changed) {
+      updateSets(updatedSets, true);
+      setChanged(false);
+    }
   };
 
   return (
@@ -78,7 +78,9 @@ export const ExerciseItem = ({
           <button
             onClick={() => {
               reveal();
-              console.log("Yo");
+              console.log(
+                "Yo, I would like to display information about this exercise"
+              );
             }}
             className="absolute right-4"
           >
@@ -93,6 +95,9 @@ export const ExerciseItem = ({
           setsInfo={setsInfo}
           exerciseId={id}
           removeSet={removeSet}
+          logExercise={logExercise}
+          saveExercise={saveExercise}
+          deleteExercise={deleteExercise}
         />
       )}
     </div>
@@ -104,6 +109,9 @@ type SetListProps = {
   exerciseId: number;
   updateSet: (aSet: ExerciseSet, index: number) => void;
   removeSet: () => void;
+  saveExercise: (sets: ExerciseSet[]) => void;
+  logExercise: (sets: ExerciseSet[]) => void;
+  deleteExercise: () => void;
 };
 
 const SetList = ({
@@ -111,6 +119,9 @@ const SetList = ({
   exerciseId,
   updateSet,
   removeSet,
+  saveExercise,
+  logExercise,
+  deleteExercise,
 }: SetListProps) => {
   const [sets, setSets] = useState(setsInfo);
   const child = useRef(null);
@@ -240,26 +251,20 @@ const SetList = ({
 
       <div className="flex sm:flex-col flex-row justify-evenly gap-2 text-lg p-2 text-center text-gray-200">
         <button
-          onClick={() => {
-            console.log("Save");
-          }}
+          onClick={() => saveExercise(sets)}
           className="border-2 rounded border-pink-700 text-gray-200 p-1 flex-grow flex justify-center items-center"
         >
           Save
         </button>
 
         <button
-          onClick={() => {
-            console.log("Log");
-          }}
+          onClick={() => logExercise(sets)}
           className="border-2 rounded border-pink-700 text-gray-200 p-1 flex-grow flex justify-center items-center"
         >
           Log
         </button>
         <button
-          onClick={() => {
-            console.log("Delete");
-          }}
+          onClick={deleteExercise}
           className="border-2 rounded border-pink-700 text-gray-200 p-1 flex-grow flex justify-center items-center"
         >
           Delete
