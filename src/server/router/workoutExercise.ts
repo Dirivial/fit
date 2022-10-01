@@ -24,16 +24,12 @@ export const workoutExercise = createRouter()
       workoutId: z.number(),
     }),
     async resolve({ ctx, input }) {
-      const exercise = await ctx.prisma.workoutExercise.create({
+      return await ctx.prisma.workoutExercise.create({
         data: {
           exerciseTemplateId: input.templateId,
           workoutId: input.workoutId,
         },
       });
-      await ctx.prisma.exerciseSet.create({
-        data: { exerciseId: exercise.id },
-      });
-      return exercise;
     },
   })
   .query("delete", {
