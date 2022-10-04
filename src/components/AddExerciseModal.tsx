@@ -259,7 +259,7 @@ export const AddWorkoutModal = ({
                           <div className=" flex flex-col gap-2">
                             <label>Name</label>
                             <input
-                              className="rounded bg-slate-900 border-2 border-pink-700 p-1"
+                              className="rounded-lg bg-pink-700 border-2 border-pink-700 p-1"
                               value={name}
                               onChange={(e) => {
                                 if (e.target.value.length < 64) {
@@ -274,7 +274,7 @@ export const AddWorkoutModal = ({
                             />
                             <label>Description</label>
                             <input
-                              className="rounded bg-slate-900 border-2 border-pink-700 p-1"
+                              className="rounded-lg bg-pink-700 border-2 border-pink-700 p-1"
                               value={desc}
                               onChange={(e) => setDesc(e.target.value)}
                             />
