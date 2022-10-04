@@ -6,6 +6,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import HomeHeader from "../../components/homeHeader";
 import SetHead from "../../components/setHead";
 import { AddWorkoutModal } from "../../components/AddExerciseModal";
+import { DeleteItemModal } from "../../components/DeleteItemModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
@@ -32,6 +33,7 @@ const WorkoutPage: NextPage = () => {
   const [workoutItems, setWorkoutItems] = useState<ExerciseItemType[]>([]);
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
   const [openModal, setOpenModal] = useState(false);
+  const [showWorkoutDeleteModal, setShowWorkoutDeleteModal] = useState(false);
   const [waiting, setWaiting] = useState(true);
   const context = trpc.useContext();
   const { data: session } = useSession();
@@ -67,6 +69,7 @@ const WorkoutPage: NextPage = () => {
       "workout.delete",
       { id: workoutId, workoutExerciseIds: workoutItems.map((i) => i.id) },
     ]);
+    setShowWorkoutDeleteModal(false);
     router.replace("/workout");
   };
 
@@ -82,7 +85,6 @@ const WorkoutPage: NextPage = () => {
 
   const updateItem = (sets: ExerciseSet[], changed: boolean, index: number) => {
     if (!changed) return;
-    const workoutItem = workoutItems[index];
     setWorkoutItems((prev) => {
       const next = [...prev];
       const exercise = next[index];
@@ -150,6 +152,12 @@ const WorkoutPage: NextPage = () => {
   return (
     <>
       <SetHead />
+      <DeleteItemModal
+        // Workout delete modal
+        open={showWorkoutDeleteModal}
+        proceedWithDelete={() => deleteWorkout()}
+        closeModal={() => setShowWorkoutDeleteModal(false)}
+      />
 
       <main className="container mx-auto flex flex-col items-center min-h-screen p-4">
         <HomeHeader size="text-2xl" />
@@ -208,7 +216,7 @@ const WorkoutPage: NextPage = () => {
           </button>
 
           <button
-            onClick={() => deleteWorkout()}
+            onClick={() => setShowWorkoutDeleteModal(true)}
             className="p-2 font-semibold text-xl border-2 rounded border-pink-700 text-gray-200 duration-500 motion-safe:hover:scale-105"
           >
             Delete Workout
