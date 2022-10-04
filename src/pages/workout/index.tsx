@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import Link from "next/link";
 import { trpc } from "../../utils/trpc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import HomeHeader from "../../components/homeHeader";
 import SetHead from "../../components/setHead";
@@ -67,16 +67,10 @@ const WorkoutListPage: NextPage = () => {
 
         <div className="p-6" />
         <h2 className="text-2xl text-gray-200">Choose Workout</h2>
-        <h4 className="text-lg text-gray-200">
-          or{" "}
-          <span className="text-indigo-400">
-            <button onClick={() => setShowModal(true)}>create one!</button>
-          </span>
-        </h4>
         {!loading ? (
           <div
             ref={workoutsRef}
-            className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3"
+            className="flex flex-col gap-3 pt-3 mt-3 text-center lg:w-2/3"
           >
             {workouts.map((thing, index) => {
               return (
@@ -88,6 +82,18 @@ const WorkoutListPage: NextPage = () => {
                 />
               );
             })}
+            <button
+              className="text-xl p-3 duration-500 border-2 border-pink-700 rounded shadow-xl motion-safe:hover:scale-105"
+              onClick={() => setShowModal(true)}
+            >
+              <div className="text-xl font-bold flex justify-center">
+                <FontAwesomeIcon
+                  icon={faPlus}
+                  className="w-10 h-10 text-pink-700"
+                />
+              </div>
+            </button>
+            <div className="p-3" />
           </div>
         ) : (
           <div className="text-lg font-semibold text-violet-600 p-6">

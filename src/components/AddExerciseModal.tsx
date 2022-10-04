@@ -99,14 +99,40 @@ export const AddWorkoutModal = ({
                 <Dialog.Panel className="w-full h-fit max-w-md border-2 border-pink-700 transform overflow-visible rounded bg-slate-900 p-6 text-middle align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-medium leading-6 text-gray-200"
+                    className="text-lg font-medium leading-6 text-gray-200 pb-6"
                   >
                     Add Exercise
                   </Dialog.Title>
                   <Tab.Group>
-                    <Tab.List className="text-gray-200">
-                      <Tab className="p-1">Search</Tab>
-                      <Tab className="p-1">Create</Tab>
+                    <Tab.List className="text-gray-200 flex gap-3 justify-center">
+                      <Tab as={Fragment}>
+                        {({ selected }) => (
+                          /* Use the `selected` state to conditionally style the selected tab. */
+                          <button
+                            className={
+                              selected
+                                ? "text-gray-200 border-2 border-pink-700 rounded p-2"
+                                : "text-gray-300 rounded p-2"
+                            }
+                          >
+                            Search
+                          </button>
+                        )}
+                      </Tab>
+                      <Tab as={Fragment}>
+                        {({ selected }) => (
+                          /* Use the `selected` state to conditionally style the selected tab. */
+                          <button
+                            className={
+                              selected
+                                ? "text-gray-200 border-2 border-pink-700 rounded p-2"
+                                : "text-gray-300 rounded p-2"
+                            }
+                          >
+                            Create
+                          </button>
+                        )}
+                      </Tab>
                     </Tab.List>
                     <Tab.Panels>
                       <Tab.Panel>
