@@ -23,10 +23,25 @@ const Home: NextPage = () => {
         </h1>
 
         {session ? (
+          <p className="flex text-gray-200 mt-2 text-lg flex-col justify-center text-center">
+            <p>Hello, {session.user ? session.user.name : ""}</p>
+          </p>
+        ) : (
+          <>
+            <p className="text-gray-200 text-lg">
+              Please sign in to use this site!{" "}
+            </p>
+            <button className="text-violet-400" onClick={() => signIn()}>
+              Sign in
+            </button>
+          </>
+        )}
+
+        {session ? (
           <>
             <p className="text-2xl text-gray-200">What would you like to do?</p>
-            <div className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3">
-              <section className="flex flex-col justify-center duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
+            <div className="flex gap-3 pt-3 mt-3 text-center flex-col items-center md:justify-center md:flex-row w-3/4">
+              <section className="flex flex-col w-4/5 justify-center duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
                 <Link href="/workout">
                   <div className="p-6 cursor-pointer flex-grow">
                     <h2 className="text-2xl justify-start font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-700 to-red-600">
@@ -40,7 +55,8 @@ const Home: NextPage = () => {
                   </div>
                 </Link>
               </section>
-              <section className="flex flex-col justify-center duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
+              <p className="text-xl text-gray-200 font-semibold">OR</p>
+              <section className="flex flex-col w-4/5 justify-center duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
                 <Link href="/analysis">
                   <div className="p-6 cursor-pointer flex-grow">
                     <h2 className="text-2xl justify-start font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-500 to-violet-700">
@@ -49,32 +65,24 @@ const Home: NextPage = () => {
                     <hr />
                     <div className="p-2" />
                     <p className="text-sm font-semibold text-gray-200">
-                      Take a look at how you have progressed.
+                      Look at your progress!
                     </p>
                   </div>
                 </Link>
               </section>
             </div>
+
+            <div className="p-2" />
+
+            <button
+              onClick={() => signOut()}
+              className="text-indigo-800 duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105 font-extrabold p-2"
+            >
+              Sign out
+            </button>
           </>
         ) : (
           <></>
-        )}
-        {session ? (
-          <p className="text-gray-200 mt-2">
-            Welcome, {session.user ? session.user.email : ""}.{" "}
-            <button onClick={() => signOut()} className="text-violet-400">
-              Sign out
-            </button>
-          </p>
-        ) : (
-          <>
-            <p className="text-gray-200 text-lg">
-              Please sign in to use this site!{" "}
-            </p>
-            <button className="text-violet-400" onClick={() => signIn()}>
-              Sign in
-            </button>
-          </>
         )}
       </main>
     </>
