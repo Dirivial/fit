@@ -1,7 +1,7 @@
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 
 type DeleteItemModalProps = {
   open: boolean;
@@ -15,6 +15,10 @@ export const DeleteItemModal = ({
   closeModal,
 }: DeleteItemModalProps) => {
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) setLoading(false);
+  }, [open]);
 
   return (
     <Transition appear show={open} as={Fragment}>
