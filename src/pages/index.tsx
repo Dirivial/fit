@@ -24,7 +24,7 @@ const Home: NextPage = () => {
 
         {session ? (
           <p className="flex text-gray-200 mt-2 text-lg flex-col justify-center text-center">
-            <p>Hello, {session.user ? session.user.name : ""}</p>
+            Hello, {session.user ? session.user.name : ""}
           </p>
         ) : (
           <>
