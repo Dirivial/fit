@@ -10,9 +10,11 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { User, Workout } from "@prisma/client";
 import { CreateWorkoutModal } from "../../components/CreateWorkoutModal";
+import { useRouter } from "next/router";
 
 const WorkoutListPage: NextPage = () => {
   const { data: session } = useSession();
+  const router = useRouter();
   const context = trpc.useContext();
   const [user, setUser] = useState<User>();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -24,26 +26,24 @@ const WorkoutListPage: NextPage = () => {
     if (session?.user?.email) {
       const email = session.user.email;
       const getUser = async () => {
-        const res = await context.fetchQuery(["user.get", { email }]);
-        setUser(res!);
-      };
-      getUser();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (user?.id) {
-      const id = user.id;
-      const getWorkouts = async () => {
-        const res = await context.fetchQuery(["workout.getAll", { id }]);
+        const res = await context.fetchQuery([
+          "user.getWithWorkouts",
+          { email },
+        ]);
         if (res) {
-          setWorkouts(res);
+          setUser(res);
+          setWorkouts(res.Workout);
           setLoading(false);
+        } else {
+          console.error("Could not find user");
+          router.replace("/");
         }
       };
-      getWorkouts();
+      getUser();
+    } else {
+      router.replace("/");
     }
-  }, [user]);
+  }, []);
 
   const addWorkout = (workout: Workout) => {
     setWorkouts((prev) => [...prev, workout]);
