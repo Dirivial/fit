@@ -12,7 +12,6 @@ export const user = createRouter()
           email: input.email,
         },
       });
-      console.log(user);
       return user;
     },
   })
@@ -29,7 +28,22 @@ export const user = createRouter()
           Workout: true,
         },
       });
-      console.log(user);
+      return user;
+    },
+  })
+  .query("getWithTemplates", {
+    input: z.object({
+      email: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      const user = await ctx.prisma.user.findFirst({
+        where: {
+          email: input.email,
+        },
+        include: {
+          ExerciseTemplates: true,
+        },
+      });
       return user;
     },
   });
