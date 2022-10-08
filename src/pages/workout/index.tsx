@@ -14,36 +14,22 @@ import { useRouter } from "next/router";
 
 const WorkoutListPage: NextPage = () => {
   const { data: session } = useSession();
-  const router = useRouter();
-  const context = trpc.useContext();
-  const [user, setUser] = useState<User>();
+  const userWithWorkouts = trpc.useQuery([
+    "user.getWithWorkouts",
+    { email: session?.user?.email },
+  ]);
+
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    if (session?.user?.email) {
-      const email = session.user.email;
-      const getUser = async () => {
-        const res = await context.fetchQuery([
-          "user.getWithWorkouts",
-          { email },
-        ]);
-        if (res) {
-          setUser(res);
-          setWorkouts(res.Workout);
-          setLoading(false);
-        } else {
-          console.error("Could not find user");
-          router.replace("/");
-        }
-      };
-      getUser();
-    } else {
-      router.replace("/");
+    if (userWithWorkouts.data) {
+      setWorkouts(userWithWorkouts.data.Workout);
+      setLoading(false);
     }
-  }, []);
+  }, [userWithWorkouts]);
 
   const addWorkout = (workout: Workout) => {
     setWorkouts((prev) => [...prev, workout]);
@@ -53,9 +39,9 @@ const WorkoutListPage: NextPage = () => {
     <>
       <SetHead />
 
-      {user ? (
+      {userWithWorkouts?.data?.id ? (
         <CreateWorkoutModal
-          userid={user.id}
+          userid={userWithWorkouts.data.id}
           open={showModal}
           addWorkout={addWorkout}
           closeModal={() => setShowModal(false)}
