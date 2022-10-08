@@ -10,12 +10,7 @@ import { DeleteItemModal } from "../../components/DeleteItemModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import {
-  ExerciseSet,
-  ExerciseTemplate,
-  User,
-  WorkoutExercise,
-} from "@prisma/client";
+import { ExerciseSet, ExerciseTemplate, WorkoutExercise } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { ExerciseItem } from "../../components/ExerciseItem";
 

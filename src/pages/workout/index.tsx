@@ -8,9 +8,8 @@ import HomeHeader from "../../components/homeHeader";
 import SetHead from "../../components/setHead";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { User, Workout } from "@prisma/client";
+import { Workout } from "@prisma/client";
 import { CreateWorkoutModal } from "../../components/CreateWorkoutModal";
-import { useRouter } from "next/router";
 
 const WorkoutListPage: NextPage = () => {
   const { data: session } = useSession();
