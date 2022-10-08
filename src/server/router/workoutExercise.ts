@@ -51,11 +51,17 @@ export const workoutExercise = createRouter()
   .query("getWorkoutExercises", {
     input: z.object({
       workoutId: z.number(),
+      userId: z.string(),
     }),
     async resolve({ ctx, input }) {
-      return await ctx.prisma.workoutExercise.findMany({
+      const res = await ctx.prisma.workoutExercise.findMany({
         where: { workoutId: input.workoutId },
         include: { ExerciseTemplate: true, ExerciseSets: true },
       });
+      if (res.every((item) => item.ExerciseTemplate.userId === input.userId)) {
+        return res;
+      } else {
+        return null;
+      }
     },
   });

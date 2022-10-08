@@ -2,9 +2,11 @@ import type { NextPage } from "next";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
+import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
   const { data: session } = useSession();
+  trpc.useQuery(["user.get", { email: session?.user?.email }]);
 
   return (
     <>

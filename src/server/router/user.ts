@@ -4,7 +4,7 @@ import { z } from "zod";
 export const user = createRouter()
   .query("get", {
     input: z.object({
-      email: z.string(),
+      email: z.string().nullish(),
     }),
     async resolve({ ctx, input }) {
       const user = await ctx.prisma.user.findFirst({

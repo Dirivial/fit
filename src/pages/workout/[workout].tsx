@@ -25,10 +25,24 @@ type ExerciseItemType = WorkoutExercise & {
 };
 
 const WorkoutPage: NextPage = () => {
+  const { data: session } = useSession();
   const router = useRouter();
+
+  const user = trpc.useQuery(["user.get", { email: session?.user?.email }]);
+
+  if (!user.data) {
+    router.replace("/");
+    return <></>;
+  }
+
   const { workout } = router.query;
   const workoutId = Number(workout?.slice(3, workout?.indexOf("&")));
   const name = workout ? workout.slice(workout?.indexOf("name=") + 5) : "";
+
+  const cachedWorkouts = trpc.useQuery([
+    "workoutExercise.getWorkoutExercises",
+    { workoutId: workoutId, userId: user.data.id },
+  ]);
 
   const [workoutItems, setWorkoutItems] = useState<ExerciseItemType[]>([]);
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
@@ -43,33 +57,13 @@ const WorkoutPage: NextPage = () => {
   }>({ workoutExerciseId: -1, index: -1 });
   const [waiting, setWaiting] = useState(true);
   const context = trpc.useContext();
-  const { data: session } = useSession();
-  const [user, setUser] = useState<User>();
 
   useEffect(() => {
-    if (!session?.user?.email) return;
-    const mail = session.user.email;
-    const getUser = async () => {
-      const res = await context.fetchQuery(["user.get", { email: mail }]);
-      if (res) {
-        setUser(res);
-      }
-    };
-    getUser();
-  }, [session]);
-
-  useEffect(() => {
-    if (!workoutId) return;
-    const myAsyncFunc = async () => {
-      const res = await context.fetchQuery([
-        "workoutExercise.getWorkoutExercises",
-        { workoutId },
-      ]);
-      setWorkoutItems(res);
+    if (cachedWorkouts.data) {
+      setWorkoutItems(cachedWorkouts.data);
       setWaiting(false);
-    };
-    myAsyncFunc();
-  }, [context, workoutId]);
+    }
+  }, [cachedWorkouts]);
 
   const deleteWorkout = async () => {
     const res = await context.fetchQuery([
@@ -251,9 +245,9 @@ const WorkoutPage: NextPage = () => {
             Delete Workout
           </button>
         </div>
-        {user?.id ? (
+        {user.data.id ? (
           <AddWorkoutModal
-            userid={user.id}
+            userid={user.data.id}
             workoutid={workoutId}
             open={openModal}
             addExercise={addExercise}
