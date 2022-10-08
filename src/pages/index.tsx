@@ -5,8 +5,19 @@ import Link from "next/link";
 import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   trpc.useQuery(["user.get", { email: session?.user?.email }]);
+
+  if (status === "loading") {
+    return (
+      <div className="container mx-auto flex flex-col items-center justify-center min-h-screen p-4">
+        <h1 className="text-5xl md:text-[5rem] leading-normal font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-green-400 via-violet-800 to-indigo-500">
+          Fit.Dirivial
+        </h1>
+        <p className="text-gray-200">Checking if logged in...</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -24,7 +35,7 @@ const Home: NextPage = () => {
           Fit.Dirivial
         </h1>
 
-        {session ? (
+        {status === "authenticated" ? (
           <p className="flex text-gray-200 mt-2 text-lg flex-col justify-center text-center">
             Hello, {session.user ? session.user.name : ""}
           </p>
@@ -39,7 +50,7 @@ const Home: NextPage = () => {
           </>
         )}
 
-        {session ? (
+        {status === "authenticated" ? (
           <>
             <p className="text-2xl text-gray-200">What would you like to do?</p>
             <div className="flex gap-3 pt-3 mt-3 text-center flex-col items-center md:justify-center md:flex-row w-3/4">
