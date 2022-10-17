@@ -32,11 +32,12 @@ export const exerciseTemplate = createRouter()
   })
   .query("getAll", {
     input: z.object({
-      id: z.string(),
+      userId: z.string().nullish(),
     }),
     async resolve({ ctx, input }) {
+      if (!input.userId) return null;
       return await ctx.prisma.exerciseTemplate.findMany({
-        where: { userId: input.id },
+        where: { userId: input.userId },
       });
     },
   });
