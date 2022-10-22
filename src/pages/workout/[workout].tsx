@@ -41,7 +41,7 @@ const WorkoutPage: NextPage = () => {
   const { workout } = router.query;
   const workoutId = Number(workout?.slice(3, workout?.indexOf("&")));
   const name = workout ? workout.slice(workout?.indexOf("name=") + 5) : "";
-  var cachedWorkouts: ExerciseItemType[] = [];
+  let cachedWorkouts: ExerciseItemType[] = [];
 
   useEffect(() => {
     if (workoutItems.length == 0 && cachedWorkouts) {
