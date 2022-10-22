@@ -38,27 +38,31 @@ const WorkoutPage: NextPage = () => {
   const [waiting, setWaiting] = useState(true);
   const context = trpc.useContext();
 
+  const { workout } = router.query;
+  const workoutId = Number(workout?.slice(3, workout?.indexOf("&")));
+  const name = workout ? workout.slice(workout?.indexOf("name=") + 5) : "";
+  var cachedWorkouts: ExerciseItemType[] = [];
+
+  useEffect(() => {
+    if (workoutItems.length == 0 && cachedWorkouts) {
+      setWorkoutItems(cachedWorkouts);
+      setWaiting(false);
+      console.log("gaming");
+    }
+  }, [cachedWorkouts]);
+
   if (!user.data) {
     router.replace("/");
     return <></>;
   }
 
-  const { workout } = router.query;
-  const workoutId = Number(workout?.slice(3, workout?.indexOf("&")));
-  const name = workout ? workout.slice(workout?.indexOf("name=") + 5) : "";
-
-  const cachedWorkouts = trpc.useQuery([
+  const temp = trpc.useQuery([
     "workoutExercise.getWorkoutExercises",
     { workoutId: workoutId, userId: user.data.id },
-  ]);
-
-  useEffect(() => {
-    if (workoutItems.length == 0 && cachedWorkouts.data) {
-      setWorkoutItems(cachedWorkouts.data);
-      setWaiting(false);
-      console.log("gaming");
-    }
-  }, [cachedWorkouts]);
+  ]).data;
+  if (temp) {
+    cachedWorkouts = temp;
+  }
 
   const deleteWorkout = async () => {
     const res = await context.fetchQuery([
