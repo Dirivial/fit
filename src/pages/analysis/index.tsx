@@ -105,7 +105,7 @@ const AnalyzePage: NextPage = () => {
         <div className="flex gap-3">
           <SearchForTemplate
             setSelectedExercise={(exercise) => setSelected(exercise)}
-            templates={exercises.data ? exercises.data : []}
+            templates={() => (exercises.data ? exercises.data : [])}
           />
           <button className="text-lg text-gray-200 rounded border-2 border-violet-800 bg-violet-800 p-1">
             Load

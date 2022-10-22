@@ -5,7 +5,7 @@ import { ExerciseTemplate } from "@prisma/client";
 import { Fragment, useEffect, useState } from "react";
 
 type SearchForTemplateType = {
-  templates: ExerciseTemplate[];
+  templates: () => ExerciseTemplate[];
   setSelectedExercise: (exercise: ExerciseTemplate) => void;
 };
 
@@ -14,7 +14,7 @@ const SearchForTemplate = ({
   setSelectedExercise,
 }: SearchForTemplateType) => {
   const [selected, setSelected] = useState<ExerciseTemplate>();
-  const [exercises, setExercises] = useState<ExerciseTemplate[]>(templates);
+  const [exercises, setExercises] = useState<ExerciseTemplate[]>(templates());
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -37,7 +37,10 @@ const SearchForTemplate = ({
               displayValue={() => (selected ? selected.name : "")}
               onChange={(event) => setQuery(event.target.value)}
             />
-            <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+            <Combobox.Button
+              onClick={() => setExercises(templates())}
+              className="absolute inset-y-0 right-0 flex items-center pr-2"
+            >
               <FontAwesomeIcon
                 icon={faSort}
                 className="text-gray-200 w-5 h-5"
