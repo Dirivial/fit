@@ -24,6 +24,19 @@ const WorkoutPage: NextPage = () => {
   const router = useRouter();
 
   const user = trpc.useQuery(["user.get", { email: session?.user?.email }]);
+  const [workoutItems, setWorkoutItems] = useState<ExerciseItemType[]>([]);
+  const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
+  const [openModal, setOpenModal] = useState(false);
+  const [showDeleteWorkoutModal, setShowDeleteWorkoutModal] =
+    useState<boolean>(false);
+  const [showDeleteItemModal, setShowDeleteItemModal] =
+    useState<boolean>(false);
+  const [exerciseSelected, setExerciseSelected] = useState<{
+    workoutExerciseId: number;
+    index: number;
+  }>({ workoutExerciseId: -1, index: -1 });
+  const [waiting, setWaiting] = useState(true);
+  const context = trpc.useContext();
 
   if (!user.data) {
     router.replace("/");
@@ -38,20 +51,6 @@ const WorkoutPage: NextPage = () => {
     "workoutExercise.getWorkoutExercises",
     { workoutId: workoutId, userId: user.data.id },
   ]);
-
-  const [workoutItems, setWorkoutItems] = useState<ExerciseItemType[]>([]);
-  const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
-  const [openModal, setOpenModal] = useState(false);
-  const [showDeleteWorkoutModal, setShowDeleteWorkoutModal] =
-    useState<boolean>(false);
-  const [showDeleteItemModal, setShowDeleteItemModal] =
-    useState<boolean>(false);
-  const [exerciseSelected, setExerciseSelected] = useState<{
-    workoutExerciseId: number;
-    index: number;
-  }>({ workoutExerciseId: -1, index: -1 });
-  const [waiting, setWaiting] = useState(true);
-  const context = trpc.useContext();
 
   useEffect(() => {
     if (workoutItems.length == 0 && cachedWorkouts.data) {
