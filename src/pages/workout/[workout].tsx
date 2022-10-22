@@ -52,7 +52,6 @@ const WorkoutPage: NextPage = () => {
   }, [cachedWorkouts]);
 
   if (!user.data) {
-    router.replace("/");
     return <></>;
   }
 
@@ -70,7 +69,6 @@ const WorkoutPage: NextPage = () => {
       { id: workoutId, workoutExerciseIds: workoutItems.map((i) => i.id) },
     ]);
     setShowDeleteWorkoutModal(false);
-    router.replace("/workout");
   };
 
   const addExercise = async (id: number) => {
