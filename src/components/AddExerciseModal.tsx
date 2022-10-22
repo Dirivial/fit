@@ -4,6 +4,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSort, faCheck, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { useSession } from "next-auth/react";
 
 type AddWorkoutModalProps = {
   userid: string;
@@ -21,28 +22,16 @@ export const AddWorkoutModal = ({
   closeModal,
 }: AddWorkoutModalProps) => {
   const context = trpc.useContext();
-  const [exercises, setExercises] = useState<ExerciseTemplate[]>([]);
+  const exercises = trpc.useQuery([
+    "exerciseTemplate.getAll",
+    { userId: userid },
+  ]).data;
   const [selected, setSelected] = useState<ExerciseTemplate>();
   const [query, setQuery] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
-
-  useEffect(() => {
-    const func = async () => {
-      const res = await context.fetchQuery([
-        "exerciseTemplate.getAll",
-        { id: userid },
-      ]);
-      if (res) {
-        setExercises(res);
-      } else {
-        setExercises([]);
-      }
-    };
-    func();
-  }, []);
 
   const addExerciseFromTemplate = async () => {
     if (!selected) return; // Add some type of message to the user
