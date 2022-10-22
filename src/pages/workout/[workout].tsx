@@ -54,9 +54,10 @@ const WorkoutPage: NextPage = () => {
   const context = trpc.useContext();
 
   useEffect(() => {
-    if (cachedWorkouts.data) {
+    if (workoutItems.length == 0 && cachedWorkouts.data) {
       setWorkoutItems(cachedWorkouts.data);
       setWaiting(false);
+      console.log("gaming");
     }
   }, [cachedWorkouts]);
 
