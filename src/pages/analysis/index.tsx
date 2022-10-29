@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import HomeHeader from "../../components/homeHeader";
 import SearchForTemplate from "../../components/SearchForTemplate";
 import SetHead from "../../components/setHead";
@@ -18,7 +18,7 @@ import {
   ScatterDataPoint,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { Exercise, ExerciseSet, ExerciseTemplate } from "@prisma/client";
+import { ExerciseSet, ExerciseTemplate } from "@prisma/client";
 
 ChartJS.register(
   CategoryScale,
