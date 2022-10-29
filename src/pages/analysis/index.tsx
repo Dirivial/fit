@@ -14,9 +14,11 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartData,
+  ScatterDataPoint,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { ExerciseTemplate } from "@prisma/client";
+import { Exercise, ExerciseSet, ExerciseTemplate } from "@prisma/client";
 
 ChartJS.register(
   CategoryScale,
@@ -28,7 +30,25 @@ ChartJS.register(
   Legend
 );
 
+type DataPoint = {
+  sets: ExerciseSet[];
+  year: number;
+  month: number;
+  day: number;
+};
+
+type Data = {
+  labels: String[];
+  datasets: {
+    label: String;
+    data: number[];
+    borderColor: String;
+    backgroundColor: String;
+  }[];
+};
+
 const AnalyzePage: NextPage = () => {
+  const context = trpc.useContext();
   const { data: session } = useSession();
   const userid = trpc.useQuery([
     "user.get",
@@ -39,8 +59,8 @@ const AnalyzePage: NextPage = () => {
     { userId: userid?.id },
   ]);
   const [selected, setSelected] = useState<ExerciseTemplate>();
-
-  const labels = [
+  const [datapoints, setDatapoints] = useState<DataPoint[]>([]);
+  const [labelsToDisplay, setLabelsToDisplay] = useState<String[]>([
     "January",
     "February",
     "March",
@@ -53,18 +73,71 @@ const AnalyzePage: NextPage = () => {
     "October",
     "November",
     "December",
-  ];
-
-  const data = {
-    labels,
+  ]);
+  const [dataToDisplay, setDataToDisplay] = useState<
+    ChartData<"line", (number | ScatterDataPoint | null)[], unknown>
+  >({
+    labels: labelsToDisplay,
     datasets: [
       {
         label: "",
-        data: [1, 1, 2, 1, 2, 3, 3, 4, 4, 5, 5, 5, 6, 7, 8],
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         borderColor: "rgb(90, 33, 181)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
     ],
+  });
+  const [year, setYear] = useState<number>(2022);
+
+  const updateDataToDisplay = (data: DataPoint[]) => {
+    const sumOfData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    data.forEach((value) => {
+      sumOfData[value.month] += 1;
+    });
+
+    setDataToDisplay((prev) => {
+      const newData = prev;
+      newData.datasets = [
+        {
+          label: selected ? selected.name : "",
+          data: sumOfData,
+          borderColor: "rgb(90, 33, 181)",
+          backgroundColor: "rgba(255, 99, 132, 0.5)",
+        },
+      ];
+      return newData;
+    });
+  };
+
+  const fetchHistory = async () => {
+    if (!selected) return;
+    const result = await context.fetchQuery([
+      "exerciseTemplate.getHistory",
+      { id: selected.id },
+    ]);
+    if (result?.Exercise) {
+      const newData = result.Exercise.map((history) => {
+        const date = history.date;
+        if (!date)
+          return {
+            sets: history.ExerciseSets,
+            year: 0,
+            month: 0,
+            day: 0,
+          };
+        return {
+          sets: history.ExerciseSets,
+          year: date.getFullYear(),
+          month: date.getMonth(),
+          day: date.getDay(),
+        };
+      });
+
+      setDatapoints(newData);
+      console.log(newData);
+      updateDataToDisplay(newData.filter((item) => item.year == year));
+    }
   };
 
   const options = {
@@ -107,13 +180,16 @@ const AnalyzePage: NextPage = () => {
             setSelectedExercise={(exercise) => setSelected(exercise)}
             templates={() => (exercises.data ? exercises.data : [])}
           />
-          <button className="text-lg text-gray-200 rounded border-2 border-violet-800 bg-violet-800 p-1">
+          <button
+            onClick={fetchHistory}
+            className="text-lg text-gray-200 rounded border-2 border-violet-800 bg-violet-800 p-1"
+          >
             Load
           </button>
         </div>
 
         <div className="w-4/6">
-          <Line data={data} options={options} />
+          <Line data={dataToDisplay} options={options} />
         </div>
       </main>
     </>
