@@ -1,6 +1,6 @@
 import { Dialog, Transition, Combobox, Tab } from "@headlessui/react";
 import { ExerciseTemplate } from "@prisma/client";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSort, faCheck, faSpinner } from "@fortawesome/free-solid-svg-icons";
