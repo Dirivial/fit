@@ -41,7 +41,10 @@ const WorkoutPage: NextPage = () => {
   const { workout } = router.query;
   const workoutId = Number(workout?.slice(3, workout?.indexOf("&")));
   const name = workout ? workout.slice(workout?.indexOf("name=") + 5) : "";
-  let cachedWorkouts: ExerciseItemType[] = [];
+  const cachedWorkouts = trpc.useQuery([
+    "workoutExercise.getWorkoutExercises",
+    { workoutId: workoutId, userId: user.data?.id ? user.data.id : "" },
+  ]).data;
 
   useEffect(() => {
     if (workoutItems.length == 0 && cachedWorkouts) {
@@ -50,14 +53,6 @@ const WorkoutPage: NextPage = () => {
       console.log("gaming");
     }
   }, [cachedWorkouts]);
-
-  const temp = trpc.useQuery([
-    "workoutExercise.getWorkoutExercises",
-    { workoutId: workoutId, userId: user.data?.id ? user.data.id : "" },
-  ]).data;
-  if (temp) {
-    cachedWorkouts = temp;
-  }
 
   if (!user.data) {
     return <></>;
