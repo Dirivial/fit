@@ -51,16 +51,16 @@ const WorkoutPage: NextPage = () => {
     }
   }, [cachedWorkouts]);
 
-  if (!user.data) {
-    return <></>;
-  }
-
   const temp = trpc.useQuery([
     "workoutExercise.getWorkoutExercises",
-    { workoutId: workoutId, userId: user.data.id },
+    { workoutId: workoutId, userId: user.data?.id ? user.data.id : "" },
   ]).data;
   if (temp) {
     cachedWorkouts = temp;
+  }
+
+  if (!user.data) {
+    return <></>;
   }
 
   const deleteWorkout = async () => {
