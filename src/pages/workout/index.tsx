@@ -59,12 +59,7 @@ const WorkoutListPage: NextPage = () => {
           >
             {workouts.map((thing, index) => {
               return (
-                <WorkoutItem
-                  key={index}
-                  name={thing.name}
-                  description={thing.description ? thing.description : ""}
-                  id={thing.id}
-                />
+                <WorkoutItem key={index} name={thing.name} id={thing.id} />
               );
             })}
             <button
@@ -94,11 +89,10 @@ export default WorkoutListPage;
 
 type WorkoutItemProps = {
   name: string;
-  description: string;
   id: number;
 };
 
-const WorkoutItem = ({ name, description, id }: WorkoutItemProps) => {
+const WorkoutItem = ({ name, id }: WorkoutItemProps) => {
   return (
     <section className="flex flex-col justify-center duration-500 border-2 border-pink-700 rounded shadow-xl motion-safe:hover:scale-105">
       <Link href={`/workout/id=${id}&name=${name}`}>
@@ -106,9 +100,6 @@ const WorkoutItem = ({ name, description, id }: WorkoutItemProps) => {
           <h2 className="text-xl justify-start font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-700 to-red-600">
             {name}
           </h2>
-          <hr />
-          <div className="p-2" />
-          <p className="h-fill text-sm text-gray-200">{description}</p>
         </div>
       </Link>
     </section>

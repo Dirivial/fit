@@ -203,7 +203,6 @@ const WorkoutPage: NextPage = () => {
               <ExerciseItem
                 key={index}
                 name={exerciseData.name}
-                description={exerciseData.description}
                 setsInfo={setsData}
                 updateSets={(sets: ExerciseSet[], changed: boolean) =>
                   updateItem(sets, changed, index)

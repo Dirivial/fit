@@ -18,14 +18,12 @@ export const exerciseTemplate = createRouter()
     input: z.object({
       userid: z.string(),
       name: z.string(),
-      description: z.string(),
     }),
     async resolve({ ctx, input }) {
       return await ctx.prisma.exerciseTemplate.create({
         data: {
           userId: input.userid,
           name: input.name,
-          description: input.description,
         },
       });
     },

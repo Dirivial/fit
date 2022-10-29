@@ -1,12 +1,11 @@
 import autoAnimate from "@formkit/auto-animate";
-import { faInfo, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ExerciseSet } from "@prisma/client";
 import { useRef, useState, useEffect } from "react";
 
 type ExerciseItemProps = {
   name: string;
-  description: string;
   setsInfo: ExerciseSet[];
   updateSets: (sets: ExerciseSet[], changed: boolean) => void;
   logExercise: (sets: ExerciseSet[]) => void;
@@ -17,7 +16,6 @@ type ExerciseItemProps = {
 
 export const ExerciseItem = ({
   name,
-  description,
   setsInfo,
   updateSets,
   logExercise,
@@ -75,17 +73,6 @@ export const ExerciseItem = ({
             {name}
           </h2>
           <div className="p-4" />
-          <button
-            onClick={() => {
-              reveal();
-              console.log(
-                "Yo, I would like to display information about this exercise"
-              );
-            }}
-            className="absolute right-4"
-          >
-            <FontAwesomeIcon icon={faInfo} className="w-6 h-6 text-pink-500" />
-          </button>
         </div>
       </section>
 

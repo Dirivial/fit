@@ -21,7 +21,6 @@ export const CreateWorkoutModal = ({
   const context = trpc.useContext();
 
   const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
   const [loading, setLoading] = useState(false);
 
   const createWorkout = async () => {
@@ -31,7 +30,6 @@ export const CreateWorkoutModal = ({
       "workout.create",
       {
         name: name,
-        description: desc,
         userid: userid,
       },
     ]);
@@ -91,12 +89,6 @@ export const CreateWorkoutModal = ({
                           );
                         }
                       }}
-                    />
-                    <label className="text-center">Describe the workout</label>
-                    <input
-                      className="rounded bg-slate-900 border-2 border-pink-700 p-1"
-                      value={desc}
-                      onChange={(e) => setDesc(e.target.value)}
                     />
                   </div>
                   <div className="flex justify-between">

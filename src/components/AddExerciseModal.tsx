@@ -4,7 +4,6 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSort, faCheck, faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { useSession } from "next-auth/react";
 
 type AddWorkoutModalProps = {
   userid: string;
@@ -53,7 +52,6 @@ export const AddWorkoutModal = ({
       "exerciseTemplate.create",
       {
         name: name,
-        description: desc,
         userid: userid,
       },
     ]);
