@@ -37,16 +37,6 @@ type DataPoint = {
   day: number;
 };
 
-type Data = {
-  labels: String[];
-  datasets: {
-    label: String;
-    data: number[];
-    borderColor: String;
-    backgroundColor: String;
-  }[];
-};
-
 const AnalyzePage: NextPage = () => {
   const context = trpc.useContext();
   const { data: session } = useSession();
