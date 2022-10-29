@@ -50,7 +50,6 @@ const WorkoutPage: NextPage = () => {
     if (workoutItems.length == 0 && cachedWorkouts) {
       setWorkoutItems(cachedWorkouts);
       setWaiting(false);
-      console.log("gaming");
     }
   }, [cachedWorkouts]);
 
