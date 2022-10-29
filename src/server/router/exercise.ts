@@ -37,9 +37,7 @@ export const exercise = createRouter()
   .query("log", {
     input: z.object({
       templateId: z.number(),
-      sets: z.array(
-        z.object({ reps: z.number(), rest: z.number(), weight: z.number() })
-      ),
+      sets: z.array(z.object({ reps: z.number(), weight: z.number() })),
     }),
     async resolve({ ctx, input }) {
       return await ctx.prisma.exercise.create({

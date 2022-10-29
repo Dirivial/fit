@@ -124,22 +124,19 @@ const SetList = ({
   return (
     <section className="flex flex-col sm:flex-row rounded shadow-xl overflow-x-scroll">
       <div className="flex-grow flex flex-col sm:flex-row justify-start">
-        <div className="flex sm:flex-col flex-row justify-center gap-5 sm:gap-0 text-lg p-2 text-center text-gray-200">
-          <h3>Reps</h3>
-          <div className="p-2" />
-          <h3>Rest</h3>
-          <div className="p-2" />
-          <h3>Weight</h3>
+        <div className="flex sm:flex-col flex-row justify-around gap-5 sm:gap-0 text-lg p-2 text-center text-gray-200">
+          <h3 className="h-2/5 pt-3">Reps</h3>
+          <h3 className="h-2/5 pt-3">Weight</h3>
         </div>
         <div ref={child} className="flex flex-col sm:flex-row">
           {sets.map((set, index) => {
             return (
               <div
                 key={index}
-                className="flex sm:flex-col flex-row justify-center gap-5 sm:gap-0 text-lg p-2 text-center text-gray-200"
+                className="flex sm:flex-col flex-row justify-evenly gap-5 sm:gap-0 text-xl p-2 text-center text-gray-200"
               >
                 <input
-                  className="p-1 w-12 bg-transparent border-2 border-pink-700 rounded"
+                  className="p-1 w-16 h-2/5 bg-transparent border-2 border-pink-700 rounded"
                   value={set.reps}
                   onChange={(e) => {
                     let newSet = null;
@@ -159,26 +156,7 @@ const SetList = ({
                 />
                 <div className="p-1" />
                 <input
-                  className="p-1 w-12 bg-transparent border-2 border-pink-700 rounded"
-                  value={set.rest}
-                  onChange={(e) => {
-                    let newSet = null;
-                    setSets((prev) => {
-                      const next = [...prev];
-                      const item = next[index];
-                      if (item) {
-                        next[index]!.rest = getValidNumber(e.target.value);
-                        next[index] = item;
-                        newSet = item;
-                      }
-                      return next;
-                    });
-                    if (newSet) updateSet(newSet, index);
-                  }}
-                />
-                <div className="p-1" />
-                <input
-                  className="p-1 w-12 bg-transparent border-2 border-pink-700 rounded"
+                  className="p-1 w-16 h-2/5 bg-transparent border-2 border-pink-700 rounded"
                   value={set.weight}
                   onChange={(e) => {
                     let newSet = null;
@@ -198,13 +176,12 @@ const SetList = ({
             );
           })}
         </div>
-        <div className="flex sm:flex-col justify-evenly gap-2 p-2">
+        <div className="flex sm:flex-col justify-around gap-2 p-2">
           <button
             onClick={() => {
               const newSet: ExerciseSet = {
                 id: 0,
                 reps: 5,
-                rest: 60,
                 weight: 0,
                 exerciseId: null,
                 workoutExerciseId: exerciseId,

@@ -26,7 +26,6 @@ export const exerciseSets = createRouter()
       return await ctx.prisma.exerciseSet.update({
         data: {
           reps: input.reps,
-          rest: input.restTime,
           weight: input.weight,
         },
         where: {
@@ -40,7 +39,6 @@ export const exerciseSets = createRouter()
       sets: z
         .object({
           id: z.number(),
-          rest: z.number(),
           reps: z.number(),
           weight: z.number(),
           workoutExerciseId: z.number().nullish(),
@@ -57,7 +55,6 @@ export const exerciseSets = createRouter()
               },
               data: {
                 reps: aSet.reps,
-                rest: aSet.rest,
                 weight: aSet.weight,
               },
             });
@@ -65,7 +62,6 @@ export const exerciseSets = createRouter()
             return ctx.prisma.exerciseSet.create({
               data: {
                 reps: aSet.reps,
-                rest: aSet.rest,
                 weight: aSet.weight,
                 workoutExerciseId: aSet.workoutExerciseId,
               },
@@ -114,7 +110,6 @@ export const exerciseSets = createRouter()
         return ctx.prisma.exerciseSet.create({
           data: {
             reps: input.reps,
-            rest: input.rest,
             weight: input.weight,
             workoutExerciseId: input.workoutExerciseId,
           },
