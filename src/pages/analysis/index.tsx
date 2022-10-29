@@ -50,7 +50,7 @@ const AnalyzePage: NextPage = () => {
   ]);
   const [selected, setSelected] = useState<ExerciseTemplate>();
   const [datapoints, setDatapoints] = useState<DataPoint[]>([]);
-  const [labelsToDisplay, setLabelsToDisplay] = useState<String[]>([
+  const [labelsToDisplay, setLabelsToDisplay] = useState<string[]>([
     "January",
     "February",
     "March",
