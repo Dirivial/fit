@@ -93,8 +93,7 @@ model Exercise {
 model ExerciseSet {
     id                Int              @id @default(autoincrement())
     reps              Int              @default(5)
-    weight            Int              @default(0)
-    rest              Int              @default(60)
+    weight            Float            @default(0)
     Exercise          Exercise?        @relation(fields: [exerciseId], references: [id])
     exerciseId        Int?
     WorkoutExercise   WorkoutExercise? @relation(fields: [workoutExerciseId], references: [id])
