@@ -1,5 +1,6 @@
 import { createRouter } from "./context";
 import { z } from "zod";
+import { resolve } from "path";
 
 export const exerciseTemplate = createRouter()
   .query("get", {
@@ -43,6 +44,25 @@ export const exerciseTemplate = createRouter()
         data: {
           userId: input.userid,
           name: input.name,
+        },
+      });
+    },
+  })
+  .query("getAllWithHistory", {
+    input: z.object({
+      userId: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.exerciseTemplate.findMany({
+        where: {
+          userId: input.userId,
+        },
+        include: {
+          Exercise: {
+            include: {
+              ExerciseSets: true,
+            },
+          },
         },
       });
     },
