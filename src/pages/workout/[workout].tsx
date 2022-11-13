@@ -27,6 +27,7 @@ const WorkoutPage: NextPage = () => {
   const [workoutItems, setWorkoutItems] = useState<ExerciseItemType[]>([]);
   const [workoutsRef] = useAutoAnimate<HTMLDivElement>();
   const [openModal, setOpenModal] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
   const [showDeleteWorkoutModal, setShowDeleteWorkoutModal] =
     useState<boolean>(false);
   const [showDeleteItemModal, setShowDeleteItemModal] =
@@ -95,6 +96,7 @@ const WorkoutPage: NextPage = () => {
         sets,
       },
     ]);
+    setShowLoading(false);
   };
 
   const removeSets = async (ids: number[]) => {
@@ -117,6 +119,7 @@ const WorkoutPage: NextPage = () => {
   };
 
   const saveExercise = (sets: ExerciseSet[], i: number) => {
+    setShowLoading(true);
     const item = workoutItems[i];
     if (item && sets.length < item.ExerciseSets.length) {
       const toRemove: number[] = [];
@@ -245,6 +248,11 @@ const WorkoutPage: NextPage = () => {
           />
         ) : null}
       </main>
+      {!showLoading ? null : (
+        <div className="fixed right-2 bottom-2 bg-slate-900 border-pink-700 text-gray-200 border-2 text-xl rounded p-2">
+          <FontAwesomeIcon icon={faSpinner} className="animate-spin w-12 h-8" />
+        </div>
+      )}
     </>
   );
 };
