@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import HomeHeader from "../../components/homeHeader";
 import SearchForTemplate from "../../components/SearchForTemplate";
 import SetHead from "../../components/setHead";
@@ -37,6 +37,11 @@ type DataPoint = {
   day: number;
 };
 
+type DatasetItem = {
+  label: string;
+  data: number[];
+};
+
 const AnalyzePage: NextPage = () => {
   const context = trpc.useContext();
   const { data: session } = useSession();
@@ -45,9 +50,10 @@ const AnalyzePage: NextPage = () => {
     { email: session?.user?.email },
   ]).data;
   const exercises = trpc.useQuery([
-    "exerciseTemplate.getAll",
-    { userId: userid?.id },
+    "exerciseTemplate.getAllWithHistory",
+    { userId: userid?.id ? userid.id : "" },
   ]);
+
   const [selected, setSelected] = useState<ExerciseTemplate>();
   const [datapoints, setDatapoints] = useState<DataPoint[]>([]);
   const [labelsToDisplay, setLabelsToDisplay] = useState<string[]>([
@@ -71,9 +77,9 @@ const AnalyzePage: NextPage = () => {
     datasets: [
       {
         label: "",
-        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        borderColor: "rgb(90, 33, 181)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        data: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+        borderColor: "rgb(255, 255, 255)",
+        backgroundColor: "rgba(255, 255, 255, 0.5)",
       },
     ],
   });
@@ -82,8 +88,10 @@ const AnalyzePage: NextPage = () => {
   const updateDataToDisplay = (data: DataPoint[]) => {
     const sumOfData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
+    console.log("Yo");
     data.forEach((value) => {
       sumOfData[value.month] += 1;
+      console.log(value.month);
     });
 
     setDataToDisplay((prev) => {
@@ -92,13 +100,71 @@ const AnalyzePage: NextPage = () => {
         {
           label: selected ? selected.name : "",
           data: sumOfData,
-          borderColor: "rgb(90, 33, 181)",
-          backgroundColor: "rgba(255, 99, 132, 0.5)",
+          borderColor: "rgb(255, 255, 255)",
+          backgroundColor: "rgba(255, 255, 255, 0.5)",
+        },
+        {
+          label: selected ? selected.name : "",
+          data: sumOfData,
+          borderColor: "rgb(255, 255, 255)",
+          backgroundColor: "rgba(255, 255, 255, 0.5)",
         },
       ];
       return newData;
     });
   };
+
+  const calculatedDatasets = useMemo(() => {
+    const datasets: DatasetItem[] = [];
+
+    exercises.data?.forEach((item) => {
+      const data: number[] = [];
+      const datapoints = item.Exercise.map((history) => {
+        const date = history.date;
+        if (!date)
+          return {
+            sets: history.ExerciseSets,
+            year: 0,
+            month: 0,
+            day: 0,
+          };
+        return {
+          sets: history.ExerciseSets,
+          year: date.getFullYear(),
+          month: date.getMonth(),
+          day: date.getDay(),
+        };
+      });
+      let month = datapoints[0] ? datapoints[0].month : 0;
+      datapoints.forEach((element) => {
+        if (element.month == month) {
+          data[data.length - 1]++;
+        } else {
+          data.push(1);
+        }
+      });
+      datasets.push({
+        label: item.name,
+        data: data,
+      });
+    });
+    return datasets;
+  }, [exercises]);
+
+  useEffect(() => {
+    setDataToDisplay((prev) => {
+      const newData = prev;
+      newData.datasets = calculatedDatasets.map((item) => {
+        console.log("Label: ", item.label);
+        console.log("Data: ", item.data);
+        return {
+          label: item.label,
+          data: item.data,
+        };
+      });
+      return newData;
+    });
+  }, [calculatedDatasets]);
 
   const fetchHistory = async () => {
     if (!selected) return;
@@ -166,10 +232,10 @@ const AnalyzePage: NextPage = () => {
         <div className="p-6" />
         <h2 className="text-2xl text-gray-200">Choose exercise</h2>
         <div className="flex gap-3">
-          <SearchForTemplate
+          {/* <SearchForTemplate
             setSelectedExercise={(exercise) => setSelected(exercise)}
             templates={() => (exercises.data ? exercises.data : [])}
-          />
+          /> */}
           <button
             onClick={fetchHistory}
             className="text-lg text-gray-200 rounded border-2 border-violet-800 bg-violet-800 p-1"
