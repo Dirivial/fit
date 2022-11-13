@@ -112,10 +112,12 @@ const WorkoutPage: NextPage = () => {
     sets: ExerciseSet[],
     exerciseTemplateId: number
   ) => {
+    setShowLoading(true);
     const res = await context.fetchQuery([
       "exercise.log",
       { templateId: exerciseTemplateId, sets: sets },
     ]);
+    setShowLoading(false);
   };
 
   const saveExercise = (sets: ExerciseSet[], i: number) => {
