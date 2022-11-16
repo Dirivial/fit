@@ -135,7 +135,7 @@ const AnalyzePage: NextPage = () => {
           day: date.getDay(),
         };
       });
-      let month = datapoints[0] ? datapoints[0].month : 0;
+      const month = datapoints[0] ? datapoints[0].month : 0;
       datapoints.forEach((element) => {
         if (element.month == month) {
           data[data.length - 1]++;
