@@ -137,9 +137,6 @@ const WorkoutPage: NextPage = () => {
   const deleteExercise = async () => {
     const index = exerciseSelected?.index;
     const workoutExerciseId = exerciseSelected?.workoutExerciseId;
-    console.log("gaming");
-    //if (!index || !workoutExerciseId) return;
-    console.log("Yo");
     setWorkoutItems((prev) => {
       const next = [...prev];
       next.splice(index, 1);
@@ -193,7 +190,10 @@ const WorkoutPage: NextPage = () => {
           </div>
         )}
 
-        <div ref={workoutsRef} className="flex flex-col gap-y-1 pt-3 w-4/5">
+        <div
+          ref={workoutsRef}
+          className="flex flex-col gap-y-1 pt-3 sm:w-4/5 w-full"
+        >
           {workoutItems.map((exerciseItem, index) => {
             if (!exerciseItem.ExerciseTemplate) return;
             const exerciseData = exerciseItem.ExerciseTemplate;
