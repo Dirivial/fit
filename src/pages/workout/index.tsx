@@ -55,7 +55,7 @@ const WorkoutListPage: NextPage = () => {
         {!loading ? (
           <div
             ref={workoutsRef}
-            className="flex flex-col gap-3 pt-3 mt-3 text-center lg:w-2/3"
+            className="flex flex-col gap-3 pt-3 mt-3 text-center lg:w-2/3 w-full"
           >
             {workouts.map((thing, index) => {
               return (
