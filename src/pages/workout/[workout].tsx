@@ -210,9 +210,6 @@ const WorkoutPage: NextPage = () => {
                 logExercise={(sets: ExerciseSet[]) =>
                   logExercise(sets, exerciseData.id)
                 }
-                saveExercise={(sets: ExerciseSet[]) =>
-                  saveExercise(sets, index)
-                }
                 deleteExercise={() => {
                   setExerciseSelected({
                     workoutExerciseId: exerciseItem.id,

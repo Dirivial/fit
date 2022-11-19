@@ -9,7 +9,6 @@ type ExerciseItemProps = {
   setsInfo: ExerciseSet[];
   updateSets: (sets: ExerciseSet[], changed: boolean) => void;
   logExercise: (sets: ExerciseSet[]) => void;
-  saveExercise: (sets: ExerciseSet[]) => void;
   deleteExercise: () => void;
   id: number;
 };
@@ -19,7 +18,6 @@ export const ExerciseItem = ({
   setsInfo,
   updateSets,
   logExercise,
-  saveExercise,
   deleteExercise,
   id,
 }: ExerciseItemProps) => {
@@ -83,7 +81,6 @@ export const ExerciseItem = ({
           exerciseId={id}
           removeSet={removeSet}
           logExercise={logExercise}
-          saveExercise={saveExercise}
           deleteExercise={deleteExercise}
         />
       )}
@@ -96,7 +93,6 @@ type SetListProps = {
   exerciseId: number;
   updateSet: (aSet: ExerciseSet, index: number) => void;
   removeSet: () => void;
-  saveExercise: (sets: ExerciseSet[]) => void;
   logExercise: (sets: ExerciseSet[]) => void;
   deleteExercise: () => void;
 };
@@ -106,7 +102,6 @@ const SetList = ({
   exerciseId,
   updateSet,
   removeSet,
-  saveExercise,
   logExercise,
   deleteExercise,
 }: SetListProps) => {
@@ -215,21 +210,14 @@ const SetList = ({
 
       <div className="flex sm:flex-col flex-row justify-evenly gap-2 text-lg p-2 text-center text-gray-200">
         <button
-          onClick={() => saveExercise(sets)}
-          className="border-2 rounded border-indigo-900 bg-indigo-900 text-gray-200 p-1 flex-grow flex justify-center items-center"
-        >
-          Save
-        </button>
-
-        <button
           onClick={() => logExercise(sets)}
-          className="border-2 rounded border-pink-700 text-gray-200 p-1 flex-grow flex justify-center items-center"
+          className="border-2 rounded border-indigo-900 bg-indigo-900 text-gray-200 p-1 flex w-full justify-center items-center"
         >
           Log
         </button>
         <button
           onClick={deleteExercise}
-          className="border-2 rounded border-pink-700 bg-pink-700 text-gray-200 p-1 flex-grow flex justify-center items-center"
+          className="border-2 rounded border-pink-700 bg-pink-700 text-gray-200 p-1 flex w-full justify-center items-center"
         >
           Delete
         </button>
