@@ -22,10 +22,6 @@ export const workoutRouter = createRouter()
     }),
     async resolve({ ctx, input }) {
       return await ctx.prisma.$transaction([
-        // Delete exercise sets
-        ctx.prisma.exerciseSet.deleteMany({
-          where: { workoutExerciseId: { in: input.workoutExerciseIds } },
-        }),
         // Delete workout exercises
         ctx.prisma.workoutExercise.deleteMany({
           where: { id: { in: input.workoutExerciseIds } },

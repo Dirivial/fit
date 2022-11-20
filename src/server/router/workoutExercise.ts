@@ -13,7 +13,6 @@ export const workoutExercise = createRouter()
         },
         include: {
           ExerciseTemplate: true,
-          ExerciseSets: true,
         },
       });
     },
@@ -38,14 +37,26 @@ export const workoutExercise = createRouter()
     }),
     async resolve({ ctx, input }) {
       return await ctx.prisma.$transaction([
-        ctx.prisma.exerciseSet.deleteMany({
-          where: { workoutExerciseId: input.id },
-        }),
         ctx.prisma.workoutExercise.delete({
           where: { id: input.id },
-          include: { ExerciseSets: true },
         }),
       ]);
+    },
+  })
+  .query("update", {
+    input: z.object({
+      id: z.number(),
+      sets: z.array(z.object({ reps: z.number(), weight: z.number() })),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.workoutExercise.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          Sets: input.sets,
+        },
+      });
     },
   })
   .query("getWorkoutExercises", {
@@ -56,7 +67,7 @@ export const workoutExercise = createRouter()
     async resolve({ ctx, input }) {
       const res = await ctx.prisma.workoutExercise.findMany({
         where: { workoutId: input.workoutId },
-        include: { ExerciseTemplate: true, ExerciseSets: true },
+        include: { ExerciseTemplate: true },
       });
       if (res.every((item) => item.ExerciseTemplate.userId === input.userId)) {
         return res;

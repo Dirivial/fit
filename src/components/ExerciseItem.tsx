@@ -14,9 +14,9 @@ type ExerciseItemProps = {
   id: number;
 };
 
-type GenericSet = {
-  Weight: number;
-  Reps: number;
+export type GenericSet = {
+  weight: number;
+  reps: number;
 };
 
 export const ExerciseItem = ({
@@ -149,7 +149,7 @@ const SetList = ({
               >
                 <input
                   className="p-1 w-16 h-2/5 bg-transparent border-2 border-pink-700 rounded"
-                  value={set.Reps}
+                  value={set.reps}
                   onChange={(e) => {
                     let newSet = null;
 
@@ -157,7 +157,7 @@ const SetList = ({
                       const next = [...prev];
                       const item = next[index];
                       if (item) {
-                        item.Reps = getValidNumber(e.target.value);
+                        item.reps = getValidNumber(e.target.value);
                         next[index] = item;
                         newSet = item;
                       }
@@ -169,14 +169,14 @@ const SetList = ({
                 <div className="p-1" />
                 <input
                   className="p-1 w-16 h-2/5 bg-transparent border-2 border-pink-700 rounded"
-                  value={set.Weight}
+                  value={set.weight}
                   onChange={(e) => {
                     let newSet = null;
                     setSets((prev) => {
                       const next = [...prev];
                       newSet = next[index];
                       if (newSet) {
-                        newSet.Weight = getValidNumber(e.target.value);
+                        newSet.weight = getValidNumber(e.target.value);
                         next[index] = newSet;
                       }
                       return next;
@@ -192,8 +192,8 @@ const SetList = ({
           <button
             onClick={() => {
               const newSet: GenericSet = {
-                Reps: 10,
-                Weight: 0,
+                reps: 10,
+                weight: 0,
               };
 
               updateSet(newSet, sets.length);

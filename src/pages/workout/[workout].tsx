@@ -10,13 +10,19 @@ import { DeleteItemModal } from "../../components/DeleteItemModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { ExerciseSet, ExerciseTemplate, WorkoutExercise } from "@prisma/client";
+import {
+  ExerciseSet,
+  ExerciseTemplate,
+  Prisma,
+  WorkoutExercise,
+} from "@prisma/client";
 import { useSession } from "next-auth/react";
-import { ExerciseItem } from "../../components/ExerciseItem";
+import { ExerciseItem, GenericSet } from "../../components/ExerciseItem";
+import { workoutExercise } from "../../server/router/workoutExercise";
 
 type ExerciseItemType = WorkoutExercise & {
   ExerciseTemplate: ExerciseTemplate;
-  ExerciseSets: ExerciseSet[];
+  workoutExercise: WorkoutExercise;
 };
 
 const WorkoutPage: NextPage = () => {
@@ -49,7 +55,7 @@ const WorkoutPage: NextPage = () => {
 
   useEffect(() => {
     if (workoutItems.length == 0 && cachedWorkouts) {
-      setWorkoutItems(cachedWorkouts);
+      setWorkoutItems(cachedWorkouts as ExerciseItemType[]);
       setWaiting(false);
     }
   }, [cachedWorkouts]);
@@ -58,6 +64,7 @@ const WorkoutPage: NextPage = () => {
     return <></>;
   }
 
+  // Delete the workout
   const deleteWorkout = async () => {
     const res = await context.fetchQuery([
       "workout.delete",
@@ -66,8 +73,12 @@ const WorkoutPage: NextPage = () => {
     setShowDeleteWorkoutModal(false);
   };
 
+  // Add exercise to workout
   const addExercise = async (id: number) => {
-    const res = await context.fetchQuery(["workoutExercise.get", { id }]);
+    const res = (await context.fetchQuery([
+      "workoutExercise.get",
+      { id },
+    ])) as ExerciseItemType;
     if (!res) return;
     setWorkoutItems((prev) => {
       if (prev) {
@@ -76,43 +87,38 @@ const WorkoutPage: NextPage = () => {
     });
   };
 
-  const updateItem = (sets: ExerciseSet[], changed: boolean, index: number) => {
+  const updateItem = (
+    sets: Prisma.JsonValue,
+    changed: boolean,
+    index: number
+  ) => {
     if (!changed) return;
     setWorkoutItems((prev) => {
       const next = [...prev];
       const exercise = next[index];
-      if (exercise?.ExerciseSets !== undefined) {
-        exercise.ExerciseSets = sets;
+      if (exercise?.Sets !== undefined) {
+        exercise.Sets = sets;
         next[index] = exercise;
       }
       return next;
     });
   };
 
-  const updateSets = async (sets: ExerciseSet[]) => {
-    await context.fetchQuery([
-      "exerciseSets.spicy",
-      {
-        sets,
-      },
-    ]);
-    setShowLoading(false);
-  };
-
-  const removeSets = async (ids: number[]) => {
-    await context.fetchQuery([
-      "exerciseSets.removeMany",
-      {
-        ids,
-      },
-    ]);
-  };
-
+  // Log an exercise
   const logExercise = async (
-    sets: ExerciseSet[],
-    exerciseTemplateId: number
+    sets: GenericSet[],
+    exerciseTemplateId: number,
+    workoutExerciseId: number
   ) => {
     setShowLoading(true);
+    // TODO: Make it so the workout exercise ''knows'' about this.
+    const yo = context.fetchQuery([
+      "workoutExercise.update",
+      {
+        sets: sets,
+        id: workoutExerciseId,
+      },
+    ]);
     const res = await context.fetchQuery([
       "exercise.log",
       { templateId: exerciseTemplateId, sets: sets },
@@ -120,20 +126,7 @@ const WorkoutPage: NextPage = () => {
     setShowLoading(false);
   };
 
-  const saveExercise = (sets: ExerciseSet[], i: number) => {
-    setShowLoading(true);
-    const item = workoutItems[i];
-    if (item && sets.length < item.ExerciseSets.length) {
-      const toRemove: number[] = [];
-      while (sets.length < item.ExerciseSets.length) {
-        const aSet = item.ExerciseSets.pop();
-        if (aSet) toRemove.push(aSet.id);
-      }
-      removeSets(toRemove);
-    }
-    updateSets(sets);
-  };
-
+  // Delete an exercise from this workout. Does NOT delete an exercise completely, eg. the exercise template
   const deleteExercise = async () => {
     const index = exerciseSelected?.index;
     const workoutExerciseId = exerciseSelected?.workoutExerciseId;
@@ -195,20 +188,22 @@ const WorkoutPage: NextPage = () => {
           className="flex flex-col gap-y-1 pt-3 sm:w-4/5 w-full"
         >
           {workoutItems.map((exerciseItem, index) => {
-            if (!exerciseItem.ExerciseTemplate) return;
-            const exerciseData = exerciseItem.ExerciseTemplate;
-            const setsData = exerciseItem.ExerciseSets;
+            if (!exerciseItem.exerciseTemplateId) return;
             return (
               <ExerciseItem
                 key={index}
-                name={exerciseData.name}
-                setsInfo={setsData}
-                updateSets={(sets: ExerciseSet[], changed: boolean) =>
+                name={exerciseItem.ExerciseTemplate.name}
+                setsInfo={exerciseItem.Sets}
+                updateSets={(sets: Prisma.JsonValue, changed: boolean) =>
                   updateItem(sets, changed, index)
                 }
                 id={exerciseItem.id}
-                logExercise={(sets: ExerciseSet[]) =>
-                  logExercise(sets, exerciseData.id)
+                logExercise={(sets: GenericSet[]) =>
+                  logExercise(
+                    sets,
+                    exerciseItem.exerciseTemplateId,
+                    exerciseItem.id
+                  )
                 }
                 deleteExercise={() => {
                   setExerciseSelected({

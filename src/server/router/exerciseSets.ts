@@ -35,38 +35,27 @@ export const exerciseSets = createRouter()
     },
   })
   .query("spicy", {
+    // Potentially remove this one.
     input: z.object({
       sets: z
         .object({
           id: z.number(),
           reps: z.number(),
           weight: z.number(),
-          workoutExerciseId: z.number().nullish(),
+          exerciseId: z.number(),
         })
         .array(),
     }),
     async resolve({ ctx, input }) {
       return await ctx.prisma.$transaction(
         input.sets.map((aSet) => {
-          if (aSet.id > 0) {
-            return ctx.prisma.exerciseSet.update({
-              where: {
-                id: aSet.id,
-              },
-              data: {
-                reps: aSet.reps,
-                weight: aSet.weight,
-              },
-            });
-          } else {
-            return ctx.prisma.exerciseSet.create({
-              data: {
-                reps: aSet.reps,
-                weight: aSet.weight,
-                workoutExerciseId: aSet.workoutExerciseId,
-              },
-            });
-          }
+          return ctx.prisma.exerciseSet.create({
+            data: {
+              reps: aSet.reps,
+              weight: aSet.weight,
+              exerciseId: aSet.exerciseId,
+            },
+          });
         })
       );
     },
@@ -100,23 +89,17 @@ export const exerciseSets = createRouter()
   .query("create", {
     input: z.object({
       reps: z.number(),
-      rest: z.number(),
       weight: z.number(),
-      workoutExerciseId: z.number().nullish(),
-      exerciseId: z.number().nullish(),
+      exerciseId: z.number(),
     }),
     async resolve({ ctx, input }) {
-      if (input.workoutExerciseId) {
-        return ctx.prisma.exerciseSet.create({
-          data: {
-            reps: input.reps,
-            weight: input.weight,
-            workoutExerciseId: input.workoutExerciseId,
-          },
-        });
-      } else {
-        return null;
-      }
+      return ctx.prisma.exerciseSet.create({
+        data: {
+          reps: input.reps,
+          weight: input.weight,
+          exerciseId: input.exerciseId,
+        },
+      });
     },
   })
   .query("getAll", {
