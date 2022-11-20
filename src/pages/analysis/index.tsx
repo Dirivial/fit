@@ -17,10 +17,9 @@ import {
   ScatterDataPoint,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { ExerciseSet, ExerciseTemplate } from "@prisma/client";
+import { ExerciseSet } from "@prisma/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { exercise } from "../../server/router/exercise";
 
 ChartJS.register(
   CategoryScale,
@@ -32,19 +31,45 @@ ChartJS.register(
   Legend
 );
 
-type DataPoint = {
-  sets: ExerciseSet[];
-  year: number;
-  month: number;
-  day: number;
-};
-
 type DatasetItem = {
   label: string;
   data: number[];
   borderColor: string;
   backgroundColor: string;
 };
+
+type DataPointsObject = {
+  id: number;
+  label: string;
+  data: [
+    {
+      year: number;
+      month: number;
+      day: number;
+    }
+  ];
+};
+
+const oneYearLabels = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const YEAR = 0;
+const ALLTIME = 1;
+const THREE_MONTHS = 2;
+const MONTH = 3;
+const WEEK = 4;
 
 const AnalyzePage: NextPage = () => {
   const context = trpc.useContext();
@@ -54,31 +79,17 @@ const AnalyzePage: NextPage = () => {
     { email: session?.user?.email },
   ]).data;
   const exercises = trpc.useQuery([
-    "exerciseTemplate.getAllWithHistory",
+    "exerciseTemplate.getAllWithHistoryAndWorkouts",
     { userId: userid?.id ? userid.id : "" },
-  ]);
+  ]).data;
 
-  const [selected, setSelected] = useState<ExerciseTemplate>();
   const [isWaiting, setIsWaiting] = useState(true);
-  //const [datapoints, setDatapoints] = useState<DataPoint[]>([]);
-  const [labelsToDisplay, setLabelsToDisplay] = useState<string[]>([
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ]);
+  const [graphTimeInterval, setGraphTimeInterval] = useState(YEAR);
+
   const [dataToDisplay, setDataToDisplay] = useState<
     ChartData<"line", (number | ScatterDataPoint | null)[], unknown>
   >({
-    labels: labelsToDisplay,
+    labels: oneYearLabels,
     datasets: [
       {
         label: "",
@@ -88,52 +99,90 @@ const AnalyzePage: NextPage = () => {
       },
     ],
   });
-  const [year, setYear] = useState<number>(2022);
 
-  const calculatedDatasets = useMemo(() => {
-    if (exercises.data?.length == 0) {
-      console.log("No exercise found");
+  const parsedDataPoints = useMemo(() => {
+    // Avoid calculating stuff if we do not have any data
+    if (!exercises?.length || exercises?.length == 0) {
       return [];
     }
-    const datasets: DatasetItem[] = [];
 
-    exercises.data?.forEach((item) => {
-      const data: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-      const datapoints = item.Exercise.map((history) => {
+    const datapointsobject: DataPointsObject[] = [];
+
+    exercises?.forEach((item) => {
+      // Create datapoints for each entry in the gathered data
+      item.Exercise.forEach((history) => {
         const date = history.date;
-        if (!date)
-          return {
-            sets: history.ExerciseSets,
-            year: 0,
-            month: 0,
-            day: 0,
-          };
-        return {
-          sets: history.ExerciseSets,
-          year: date.getFullYear(),
-          month: date.getMonth(),
-          day: date.getDay(),
-        };
-      });
-      datapoints.forEach((element) => {
-        data[element.month]++;
-      });
-      datasets.push({
-        label: item.name,
-        data: data,
-        borderColor: "rgba(131, 24, 67, 0.5)",
-        backgroundColor: "rgba(131, 24, 67, 0.8)",
+        if (!date) {
+          return null;
+        }
+        item.WorkoutExercise.forEach((wExercise) => {
+          if (!wExercise.workoutId) return;
+          const workoutId = wExercise.workoutId;
+          const index = datapointsobject.findIndex(
+            (value) => value.id === workoutId
+          );
+          if (index < 0) {
+            datapointsobject.push({
+              id: workoutId,
+              label: wExercise.Workout?.name ? wExercise.Workout?.name : "",
+              data: [
+                {
+                  year: date.getFullYear(),
+                  month: date.getMonth(),
+                  day: date.getDay(),
+                },
+              ],
+            });
+          } else {
+            datapointsobject[index]?.data.push({
+              year: date.getFullYear(),
+              month: date.getMonth(),
+              day: date.getDay(),
+            });
+          }
+        });
       });
     });
-    console.log("Datasets calculated.");
-    return datasets;
+    return datapointsobject;
   }, [exercises]);
 
+  // Create datasets from some data using current graph time interval
+  function createDatasets(data: DataPointsObject[]): DatasetItem[] {
+    const todayDate = new Date();
+    const todayParsed = {
+      year: todayDate.getFullYear(),
+      month: todayDate.getMonth(),
+      day: todayDate.getDay(),
+    };
+
+    const datasets: DatasetItem[] = [];
+
+    data.forEach((item) => {
+      const filteredData = item.data.filter(
+        (value) => value.year === todayParsed.year
+      );
+      const data: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      filteredData.forEach((value) => {
+        data[value.month]++;
+      });
+      datasets.push({
+        label: item.label,
+        data: data,
+        borderColor: getRandomColor(),
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+      });
+    });
+
+    console.log("Datasets calculated: ", datasets);
+    return datasets;
+  }
+
   useEffect(() => {
-    if (calculatedDatasets.length == 0) return;
+    if (parsedDataPoints.length == 0) return;
+    const datasets = createDatasets(parsedDataPoints);
     setDataToDisplay((prev) => {
       const newData = prev;
-      newData.datasets = calculatedDatasets.map((item) => {
+      newData.datasets = datasets.map((item) => {
         return {
           label: item.label,
           data: item.data,
@@ -144,8 +193,9 @@ const AnalyzePage: NextPage = () => {
       return newData;
     });
     setIsWaiting(false);
-  }, [calculatedDatasets]);
+  }, [parsedDataPoints]);
 
+  // Options for the graph
   const options = {
     responsive: true,
     plugins: {
@@ -153,8 +203,7 @@ const AnalyzePage: NextPage = () => {
         position: "top" as const,
       },
       title: {
-        display: true,
-        text: "Logs over time",
+        display: false,
       },
     },
     scales: {
@@ -182,10 +231,13 @@ const AnalyzePage: NextPage = () => {
         <div className="p-6" />
         <h2 className="text-2xl text-gray-200">Choose exercise</h2>
         <div className="flex gap-3">
-          {/* <SearchForTemplate
+          {
+            // The following will be used later when user wants to look at a specific exercise/workout
+            /* <SearchForTemplate
             setSelectedExercise={(exercise) => setSelected(exercise)}
             templates={() => (exercises.data ? exercises.data : [])}
-          /> */}
+          /> */
+          }
           <button
             onClick={() => console.log("lmao")}
             className="text-lg text-gray-200 rounded border-2 border-violet-800 bg-violet-800 p-1"
@@ -212,6 +264,15 @@ const AnalyzePage: NextPage = () => {
 };
 
 export default AnalyzePage;
+
+function getRandomColor() {
+  var letters = "0123456789ABCDEF".split("");
+  var color = "#";
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
 
 // I might need these in the future
 

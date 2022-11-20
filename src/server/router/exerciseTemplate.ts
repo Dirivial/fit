@@ -67,6 +67,30 @@ export const exerciseTemplate = createRouter()
       });
     },
   })
+  .query("getAllWithHistoryAndWorkouts", {
+    input: z.object({
+      userId: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.exerciseTemplate.findMany({
+        where: {
+          userId: input.userId,
+        },
+        include: {
+          Exercise: {
+            include: {
+              ExerciseSets: true,
+            },
+          },
+          WorkoutExercise: {
+            include: {
+              Workout: true,
+            },
+          },
+        },
+      });
+    },
+  })
   .query("getAll", {
     input: z.object({
       userId: z.string().nullish(),
