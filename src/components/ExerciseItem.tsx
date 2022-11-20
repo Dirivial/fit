@@ -1,16 +1,22 @@
 import autoAnimate from "@formkit/auto-animate";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ExerciseSet } from "@prisma/client";
-import { useRef, useState, useEffect } from "react";
+import { ExerciseSet, Prisma } from "@prisma/client";
+import { useRef, useState, useEffect, useMemo } from "react";
+import { json } from "stream/consumers";
 
 type ExerciseItemProps = {
   name: string;
-  setsInfo: ExerciseSet[];
-  updateSets: (sets: ExerciseSet[], changed: boolean) => void;
-  logExercise: (sets: ExerciseSet[]) => void;
+  setsInfo: Prisma.JsonValue;
+  updateSets: (sets: Prisma.JsonValue, changed: boolean) => void;
+  logExercise: (sets: GenericSet[]) => void;
   deleteExercise: () => void;
   id: number;
+};
+
+type GenericSet = {
+  Weight: number;
+  Reps: number;
 };
 
 export const ExerciseItem = ({
@@ -23,12 +29,26 @@ export const ExerciseItem = ({
 }: ExerciseItemProps) => {
   const [show, setShow] = useState(false);
   const parent = useRef(null);
-  const [updatedSets, setUpdatedSets] = useState<ExerciseSet[]>(setsInfo);
+  const [updatedSets, setUpdatedSets] = useState<Prisma.JsonValue>(setsInfo);
   const [changed, setChanged] = useState<boolean>(false);
 
-  const updateSet = (aSet: ExerciseSet, index: number) => {
+  const convertedSets = useMemo(() => {
+    if (setsInfo && typeof setsInfo === "object" && Array.isArray(setsInfo)) {
+      return setsInfo as GenericSet[];
+    }
+  }, [setsInfo]);
+
+  const [exerciseSets, setExerciseSets] = useState(
+    convertedSets ? convertedSets : []
+  );
+
+  useEffect(() => {
+    setUpdatedSets(exerciseSets);
+  }, [exerciseSets]);
+
+  const updateSet = (aSet: GenericSet, index: number) => {
     setChanged(true);
-    setUpdatedSets((prev) => {
+    setExerciseSets((prev) => {
       const newSets = [...prev];
       if (newSets.length <= index) {
         newSets.push(aSet);
@@ -41,7 +61,7 @@ export const ExerciseItem = ({
 
   const removeSet = () => {
     setChanged(true);
-    setUpdatedSets((prev) => {
+    setExerciseSets((prev) => {
       const next = [...prev];
       next.pop();
       return next;
@@ -77,8 +97,7 @@ export const ExerciseItem = ({
       {show && (
         <SetList
           updateSet={updateSet}
-          setsInfo={setsInfo}
-          exerciseId={id}
+          setsInfo={exerciseSets}
           removeSet={removeSet}
           logExercise={logExercise}
           deleteExercise={deleteExercise}
@@ -89,17 +108,15 @@ export const ExerciseItem = ({
 };
 
 type SetListProps = {
-  setsInfo: ExerciseSet[];
-  exerciseId: number;
-  updateSet: (aSet: ExerciseSet, index: number) => void;
+  setsInfo: GenericSet[];
+  updateSet: (aSet: GenericSet, index: number) => void;
   removeSet: () => void;
-  logExercise: (sets: ExerciseSet[]) => void;
+  logExercise: (sets: GenericSet[]) => void;
   deleteExercise: () => void;
 };
 
 const SetList = ({
   setsInfo,
-  exerciseId,
   updateSet,
   removeSet,
   logExercise,
@@ -132,7 +149,7 @@ const SetList = ({
               >
                 <input
                   className="p-1 w-16 h-2/5 bg-transparent border-2 border-pink-700 rounded"
-                  value={set.reps}
+                  value={set.Reps}
                   onChange={(e) => {
                     let newSet = null;
 
@@ -140,7 +157,7 @@ const SetList = ({
                       const next = [...prev];
                       const item = next[index];
                       if (item) {
-                        item.reps = getValidNumber(e.target.value);
+                        item.Reps = getValidNumber(e.target.value);
                         next[index] = item;
                         newSet = item;
                       }
@@ -152,14 +169,14 @@ const SetList = ({
                 <div className="p-1" />
                 <input
                   className="p-1 w-16 h-2/5 bg-transparent border-2 border-pink-700 rounded"
-                  value={set.weight}
+                  value={set.Weight}
                   onChange={(e) => {
                     let newSet = null;
                     setSets((prev) => {
                       const next = [...prev];
                       newSet = next[index];
                       if (newSet) {
-                        newSet.weight = getValidNumber(e.target.value);
+                        newSet.Weight = getValidNumber(e.target.value);
                         next[index] = newSet;
                       }
                       return next;
@@ -174,12 +191,9 @@ const SetList = ({
         <div className="flex sm:flex-col justify-around gap-2 p-2">
           <button
             onClick={() => {
-              const newSet: ExerciseSet = {
-                id: 0,
-                reps: 5,
-                weight: 0,
-                exerciseId: null,
-                workoutExerciseId: exerciseId,
+              const newSet: GenericSet = {
+                Reps: 10,
+                Weight: 0,
               };
 
               updateSet(newSet, sets.length);
