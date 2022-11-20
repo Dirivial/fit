@@ -73,14 +73,14 @@ model Workout {
 model WorkoutExercise {
     id                 Int              @id @default(autoincrement())
     position           Int              @default(0)
-    ExerciseSets       ExerciseSet[]
+    Sets               Json?
     ExerciseTemplate   ExerciseTemplate @relation(fields: [exerciseTemplateId], references: [id])
     exerciseTemplateId Int
     Workout            Workout?         @relation(fields: [workoutId], references: [id])
     workoutId          Int?
 }
 
-// An exercise
+// An exercise, this is what is logged
 model Exercise {
     id                 Int               @id @default(autoincrement())
     ExerciseSets       ExerciseSet[]
@@ -89,15 +89,13 @@ model Exercise {
     exerciseTemplateId Int?
 }
 
-// The exercises
+// Sets of some exercise/workoutexercise
 model ExerciseSet {
-    id                Int              @id @default(autoincrement())
-    reps              Int              @default(5)
-    weight            Float            @default(0)
-    Exercise          Exercise?        @relation(fields: [exerciseId], references: [id])
-    exerciseId        Int?
-    WorkoutExercise   WorkoutExercise? @relation(fields: [workoutExerciseId], references: [id])
-    workoutExerciseId Int?
+    id         Int       @id @default(autoincrement())
+    reps       Int       @default(5)
+    weight     Float     @default(0)
+    Exercise   Exercise? @relation(fields: [exerciseId], references: [id])
+    exerciseId Int?
 }
 
 // This is mostly to make searching for a specific way easier (when analyzing)
@@ -107,6 +105,5 @@ model ExerciseTemplate {
     userId          String
     Exercise        Exercise[]
     name            String            @db.VarChar(64)
-    type            String            @default("Weightlifing")
     WorkoutExercise WorkoutExercise[]
 }
