@@ -31,6 +31,12 @@ ChartJS.register(
   Legend
 );
 
+type SmallDate = {
+  year: number;
+  month: number;
+  day: number;
+};
+
 type DatasetItem = {
   label: string;
   data: number[];
@@ -71,6 +77,8 @@ const THREE_MONTHS = 2;
 const MONTH = 3;
 const WEEK = 4;
 
+const CHART_TENSION = 0.2;
+
 const AnalyzePage: NextPage = () => {
   const context = trpc.useContext();
   const { data: session } = useSession();
@@ -96,6 +104,7 @@ const AnalyzePage: NextPage = () => {
         data: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
         borderColor: "rgb(100, 100, 100)",
         backgroundColor: "rgba(100, 100, 100, 0.5)",
+        tension: 0.1,
       },
     ],
   });
@@ -155,16 +164,30 @@ const AnalyzePage: NextPage = () => {
       day: todayDate.getDay(),
     };
 
+    const numLabels = 12;
     const datasets: DatasetItem[] = [];
+    const oldSets = new Set();
 
     data.forEach((item) => {
       const filteredData = item.data.filter(
         (value) => value.year === todayParsed.year
       );
-      const data: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      const data: number[] = [];
+      for (let i = 0; i < numLabels; i++) {
+        data.push(0);
+      }
+
       filteredData.forEach((value) => {
-        data[value.month]++;
+        // Avoid adding the same date multiple times
+        const str =
+          value.year.toString() + value.month.toString() + value.day.toString();
+        if (!oldSets.has(str)) {
+          oldSets.add(str);
+          data[value.month]++;
+        }
       });
+
+      // Add entry to datasets
       datasets.push({
         label: item.label,
         data: data,
@@ -173,7 +196,6 @@ const AnalyzePage: NextPage = () => {
       });
     });
 
-    console.log("Datasets calculated: ", datasets);
     return datasets;
   }
 
@@ -188,6 +210,7 @@ const AnalyzePage: NextPage = () => {
           data: item.data,
           borderColor: item.borderColor,
           backgroundColor: item.backgroundColor,
+          tension: CHART_TENSION,
         };
       });
       return newData;
