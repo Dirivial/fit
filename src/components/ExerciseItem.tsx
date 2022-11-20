@@ -1,9 +1,8 @@
 import autoAnimate from "@formkit/auto-animate";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ExerciseSet, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { useRef, useState, useEffect, useMemo } from "react";
-import { json } from "stream/consumers";
 
 type ExerciseItemProps = {
   name: string;
@@ -25,7 +24,6 @@ export const ExerciseItem = ({
   updateSets,
   logExercise,
   deleteExercise,
-  id,
 }: ExerciseItemProps) => {
   const [show, setShow] = useState(false);
   const parent = useRef(null);

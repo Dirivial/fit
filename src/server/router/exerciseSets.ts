@@ -1,6 +1,5 @@
 import { createRouter } from "./context";
 import { z } from "zod";
-import { ExerciseSet } from "@prisma/client";
 
 export const exerciseSets = createRouter()
   .query("get", {
@@ -32,32 +31,6 @@ export const exerciseSets = createRouter()
           id: input.id,
         },
       });
-    },
-  })
-  .query("spicy", {
-    // Potentially remove this one.
-    input: z.object({
-      sets: z
-        .object({
-          id: z.number(),
-          reps: z.number(),
-          weight: z.number(),
-          exerciseId: z.number(),
-        })
-        .array(),
-    }),
-    async resolve({ ctx, input }) {
-      return await ctx.prisma.$transaction(
-        input.sets.map((aSet) => {
-          return ctx.prisma.exerciseSet.create({
-            data: {
-              reps: aSet.reps,
-              weight: aSet.weight,
-              exerciseId: aSet.exerciseId,
-            },
-          });
-        })
-      );
     },
   })
   .query("remove", {

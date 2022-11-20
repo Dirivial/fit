@@ -10,15 +10,9 @@ import { DeleteItemModal } from "../../components/DeleteItemModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import {
-  ExerciseSet,
-  ExerciseTemplate,
-  Prisma,
-  WorkoutExercise,
-} from "@prisma/client";
+import { ExerciseTemplate, Prisma, WorkoutExercise } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { ExerciseItem, GenericSet } from "../../components/ExerciseItem";
-import { workoutExercise } from "../../server/router/workoutExercise";
 
 type ExerciseItemType = WorkoutExercise & {
   ExerciseTemplate: ExerciseTemplate;
@@ -66,7 +60,7 @@ const WorkoutPage: NextPage = () => {
 
   // Delete the workout
   const deleteWorkout = async () => {
-    const res = await context.fetchQuery([
+    await context.fetchQuery([
       "workout.delete",
       { id: workoutId, workoutExerciseIds: workoutItems.map((i) => i.id) },
     ]);
@@ -111,15 +105,16 @@ const WorkoutPage: NextPage = () => {
     workoutExerciseId: number
   ) => {
     setShowLoading(true);
-    // TODO: Make it so the workout exercise ''knows'' about this.
-    const yo = context.fetchQuery([
+    // Update workoutExercise sets blob
+    context.fetchQuery([
       "workoutExercise.update",
       {
         sets: sets,
         id: workoutExerciseId,
       },
     ]);
-    const res = await context.fetchQuery([
+    // Log exercise in db
+    await context.fetchQuery([
       "exercise.log",
       { templateId: exerciseTemplateId, sets: sets },
     ]);
@@ -139,7 +134,7 @@ const WorkoutPage: NextPage = () => {
     setExerciseSelected({ workoutExerciseId: -1, index: -1 });
 
     // User does not have to be aware about this query going through, unless it fails which I do not show anywhere :)
-    const res = await context.fetchQuery([
+    await context.fetchQuery([
       "workoutExercise.delete",
       { id: workoutExerciseId },
     ]);

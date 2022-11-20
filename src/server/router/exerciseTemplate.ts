@@ -1,6 +1,5 @@
 import { createRouter } from "./context";
 import { z } from "zod";
-import { resolve } from "path";
 
 export const exerciseTemplate = createRouter()
   .query("get", {
