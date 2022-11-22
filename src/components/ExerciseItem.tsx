@@ -18,6 +18,11 @@ export type GenericSet = {
   reps: number;
 };
 
+type StrGenericSet = {
+  weight: string;
+  reps: string;
+};
+
 export const ExerciseItem = ({
   name,
   setsInfo,
@@ -120,17 +125,20 @@ const SetList = ({
   logExercise,
   deleteExercise,
 }: SetListProps) => {
-  const [sets, setSets] = useState(setsInfo);
+  const [sets, setSets] = useState<StrGenericSet[]>(
+    setsInfo.map((item) => {
+      return {
+        weight: item.weight + "",
+        reps: item.reps + "",
+      };
+    })
+  );
   const child = useRef(null);
 
   useEffect(() => {
     child.current && autoAnimate(child.current);
   }, [child]);
 
-  const getValidNumber = (value: string) => {
-    const val = Number(value);
-    return val < 1000 ? (val > -1 ? val : 0) : 999;
-  };
   return (
     <section className="flex flex-col sm:flex-row rounded shadow-xl overflow-x-scroll">
       <div className="flex-grow flex flex-col sm:flex-row justify-start">
@@ -150,18 +158,25 @@ const SetList = ({
                   type="number"
                   min="0"
                   step="1"
+                  value={sets[index]?.reps}
                   onChange={(e) => {
-                    let newSet = sets[index];
+                    const newSet = sets[index];
                     if (newSet != undefined) {
                       setSets((prev) => {
                         const next = [...prev];
                         if (newSet) {
-                          newSet.reps = Number(e.target.value);
+                          newSet.reps = e.target.value;
                           next[index] = newSet;
                         }
                         return next;
                       });
-                      updateSet(newSet, index);
+                      updateSet(
+                        {
+                          weight: Number(newSet.weight),
+                          reps: Number(newSet.reps),
+                        },
+                        index
+                      );
                     }
                   }}
                 />
@@ -171,18 +186,25 @@ const SetList = ({
                   type="number"
                   min="0"
                   step="0.1"
+                  value={sets[index]?.weight}
                   onChange={(e) => {
-                    let newSet = sets[index];
+                    const newSet = sets[index];
                     if (newSet != undefined) {
                       setSets((prev) => {
                         const next = [...prev];
                         if (newSet) {
-                          newSet.weight = Number(e.target.value);
+                          newSet.weight = e.target.value;
                           next[index] = newSet;
                         }
                         return next;
                       });
-                      updateSet(newSet, index);
+                      updateSet(
+                        {
+                          weight: Number(newSet.weight),
+                          reps: Number(newSet.reps),
+                        },
+                        index
+                      );
                     }
                   }}
                 />
@@ -200,7 +222,7 @@ const SetList = ({
 
               updateSet(newSet, sets.length);
               setSets((prev) => {
-                return [...prev, newSet];
+                return [...prev, { weight: "0", reps: "10" }];
               });
             }}
             className="border-2 rounded border-pink-700 text-gray-200 p-1 flex-grow flex justify-center items-center"
@@ -226,7 +248,13 @@ const SetList = ({
 
       <div className="flex sm:flex-col flex-row justify-evenly gap-2 text-lg p-2 text-center text-gray-200">
         <button
-          onClick={() => logExercise(sets)}
+          onClick={() =>
+            logExercise(
+              sets.map((item) => {
+                return { weight: Number(item.weight), reps: Number(item.reps) };
+              })
+            )
+          }
           className="border-2 rounded border-indigo-900 bg-indigo-900 text-gray-200 p-1 flex w-full justify-center items-center"
         >
           Log
