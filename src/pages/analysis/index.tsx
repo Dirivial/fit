@@ -72,6 +72,11 @@ const oneYearLabels = [
   "December",
 ];
 
+const oneMonthLabels: string[] = [];
+for (let i = 1; i < 32; i++) {
+  oneMonthLabels.push(i + "");
+}
+
 const oneWeekLabels = [
   "Monday",
   "Tuesday",
@@ -88,35 +93,23 @@ type CategoryType = {
   labelCount: number;
 };
 
-const ALL = 0;
-const YEAR = 1;
-const THREE_MONTHS = 2;
-const MONTH = 3;
-const WEEK = 4;
+const YEAR = 0;
+const MONTH = 1;
+const WEEK = 2;
 
 const categories: CategoryType[] = [
   {
-    id: 0,
-    title: "All",
-    labelCount: 1,
-  },
-  {
-    id: 1,
+    id: YEAR,
     title: "Year",
     labelCount: 12,
   },
   {
-    id: 2,
-    title: "3 Months",
-    labelCount: 10,
-  },
-  {
-    id: 3,
+    id: MONTH,
     title: "Month",
     labelCount: 31,
   },
   {
-    id: 4,
+    id: WEEK,
     title: "Week",
     labelCount: 7,
   },
@@ -147,6 +140,21 @@ const AnalyzePage: NextPage = () => {
       {
         label: "",
         data: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+        borderColor: "rgb(100, 100, 100)",
+        backgroundColor: "rgba(100, 100, 100, 0.5)",
+        tension: 0.1,
+      },
+    ],
+  });
+
+  const [monthGraph, setMonthGraph] = useState<
+    ChartData<"line", (number | ScatterDataPoint | null)[], unknown>
+  >({
+    labels: oneMonthLabels,
+    datasets: [
+      {
+        label: "",
+        data: new Array(31),
         borderColor: "rgb(100, 100, 100)",
         backgroundColor: "rgba(100, 100, 100, 0.5)",
         tension: 0.1,
@@ -240,13 +248,18 @@ const AnalyzePage: NextPage = () => {
       const filteredData =
         category == YEAR
           ? item.data.filter((value) => value.year === todayParsed.year)
-          : item.data.filter((value) => {
-              return (
+          : category === WEEK
+          ? item.data.filter(
+              (value) =>
                 todayParsed.year === value.year &&
                 todayParsed.month === value.month &&
                 todayParsed.day - value.day < 8
-              );
-            });
+            )
+          : item.data.filter(
+              (value) =>
+                todayParsed.year === value.year &&
+                todayParsed.month === value.month
+            );
       const data: number[] = [];
       for (let i = 0; i < numLabels; i++) {
         data.push(0);
@@ -267,6 +280,8 @@ const AnalyzePage: NextPage = () => {
             } else {
               data[value.weekday - 1]++;
             }
+          } else {
+            data[value.day]++;
           }
         }
       });
@@ -304,6 +319,22 @@ const AnalyzePage: NextPage = () => {
     });
     setIsWaiting(false);
 
+    // Month
+    const month_datasets = createDatasets(parsedDataPoints, MONTH);
+    setMonthGraph((prev) => {
+      const newData = prev;
+      // Set the new datapoints
+      newData.datasets = month_datasets.map((item) => {
+        return {
+          label: item.label,
+          data: item.data,
+          borderColor: item.borderColor,
+          backgroundColor: item.backgroundColor,
+          tension: CHART_TENSION,
+        };
+      });
+      return newData;
+    });
     // Week
     const week_datasets = createDatasets(parsedDataPoints, WEEK);
     setWeekGraph((prev) => {
@@ -377,9 +408,6 @@ const AnalyzePage: NextPage = () => {
             ))}
           </Tab.List>
           <Tab.Panels className="w-3/4">
-            <Tab.Panel>
-              <h1>YO</h1>
-            </Tab.Panel>
             <Tab.Panel className="w-full">
               <div className="p-2" />
               <div className="">
@@ -396,10 +424,17 @@ const AnalyzePage: NextPage = () => {
               </div>
             </Tab.Panel>
             <Tab.Panel>
-              <h1>YO</h1>
-            </Tab.Panel>
-            <Tab.Panel>
-              <h1>YO</h1>
+              <div className="p-2" />
+              {isWaiting ? (
+                <div className="fixed right-2 bottom-2 bg-slate-900 border-pink-700 text-gray-200 border-2 text-xl rounded p-2">
+                  <FontAwesomeIcon
+                    icon={faSpinner}
+                    className="animate-spin w-12 h-8"
+                  />
+                </div>
+              ) : (
+                <Line data={monthGraph} options={options} />
+              )}
             </Tab.Panel>
             <Tab.Panel>
               <div className="p-2" />
