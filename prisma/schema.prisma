@@ -61,12 +61,22 @@ model VerificationToken {
 
 // For creating a workout
 model Workout {
-    id            Int               @id @default(autoincrement())
-    name          String            @db.VarChar(64)
-    lastPerformed DateTime          @default(now())
-    user          User              @relation(fields: [userId], references: [id])
-    userId        String
-    Exercises     WorkoutExercise[]
+    id         Int               @id @default(autoincrement())
+    name       String            @db.VarChar(64)
+    lastLogged DateTime          @default(now())
+    user       User              @relation(fields: [userId], references: [id])
+    userId     String
+    Exercises  WorkoutExercise[]
+    Logs       WorkoutLog[]
+}
+
+model WorkoutLog {
+    id                 Int      @id @default(autoincrement())
+    date               DateTime @default(now())
+    exercisesPerformed Int      @default(0)
+
+    Workout   Workout? @relation(fields: [workoutId], references: [id])
+    workoutId Int?
 }
 
 // The exercises a workout consists of
