@@ -30,7 +30,6 @@ export const AddWorkoutModal = ({
 
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
 
   const addExerciseFromTemplate = async () => {
     if (!selected) return; // Add some type of message to the user
@@ -45,7 +44,7 @@ export const AddWorkoutModal = ({
   };
 
   const createExercise = async () => {
-    // Add some checks to make sure the name and description is okay
+    // Add some checks to make sure the name is okay
     setLoading(true);
     // Create a new template, then add it to this workout
     const res = await context.fetchQuery([
@@ -273,12 +272,6 @@ export const AddWorkoutModal = ({
                                   );
                                 }
                               }}
-                            />
-                            <label>Description</label>
-                            <input
-                              className="rounded-lg bg-pink-700 border-2 border-pink-700 p-1"
-                              value={desc}
-                              onChange={(e) => setDesc(e.target.value)}
                             />
                           </div>
 
