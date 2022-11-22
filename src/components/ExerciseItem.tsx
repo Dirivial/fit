@@ -147,39 +147,43 @@ const SetList = ({
               >
                 <input
                   className="p-1 w-16 h-2/5 bg-transparent border-2 border-pink-700 rounded"
-                  value={set.reps}
+                  type="number"
+                  min="0"
+                  step="1"
                   onChange={(e) => {
-                    let newSet = null;
-
-                    setSets((prev) => {
-                      const next = [...prev];
-                      const item = next[index];
-                      if (item) {
-                        item.reps = getValidNumber(e.target.value);
-                        next[index] = item;
-                        newSet = item;
-                      }
-                      return next;
-                    });
-                    if (newSet) updateSet(newSet, index);
+                    let newSet = sets[index];
+                    if (newSet != undefined) {
+                      setSets((prev) => {
+                        const next = [...prev];
+                        if (newSet) {
+                          newSet.reps = Number(e.target.value);
+                          next[index] = newSet;
+                        }
+                        return next;
+                      });
+                      updateSet(newSet, index);
+                    }
                   }}
                 />
                 <div className="p-1" />
                 <input
                   className="p-1 w-16 h-2/5 bg-transparent border-2 border-pink-700 rounded"
-                  value={set.weight}
+                  type="number"
+                  min="0"
+                  step="0.1"
                   onChange={(e) => {
-                    let newSet = null;
-                    setSets((prev) => {
-                      const next = [...prev];
-                      newSet = next[index];
-                      if (newSet) {
-                        newSet.weight = getValidNumber(e.target.value);
-                        next[index] = newSet;
-                      }
-                      return next;
-                    });
-                    if (newSet) updateSet(newSet, index);
+                    let newSet = sets[index];
+                    if (newSet != undefined) {
+                      setSets((prev) => {
+                        const next = [...prev];
+                        if (newSet) {
+                          newSet.weight = Number(e.target.value);
+                          next[index] = newSet;
+                        }
+                        return next;
+                      });
+                      updateSet(newSet, index);
+                    }
                   }}
                 />
               </div>
