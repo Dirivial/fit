@@ -33,12 +33,6 @@ ChartJS.register(
   Legend
 );
 
-type SmallDate = {
-  year: number;
-  month: number;
-  day: number;
-};
-
 type DatasetItem = {
   label: string;
   data: number[];
@@ -500,62 +494,3 @@ function getRandomColor() {
   }
   return color;
 }
-
-// I might need these in the future
-
-// const updateDataToDisplay = (data: DataPoint[]) => {
-//   const sumOfData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-//   console.log("Yo");
-//   data.forEach((value) => {
-//     sumOfData[value.month] += 1;
-//     console.log(value.month);
-//   });
-
-//   setDataToDisplay((prev) => {
-//     const newData = prev;
-//     newData.datasets = [
-//       {
-//         label: selected ? selected.name : "",
-//         data: sumOfData,
-//         borderColor: "rgb(255, 255, 255)",
-//         backgroundColor: "rgba(255, 255, 255, 0.5)",
-//       },
-//       {
-//         label: selected ? selected.name : "",
-//         data: sumOfData,
-//         borderColor: "rgb(255, 255, 255)",
-//         backgroundColor: "rgba(255, 255, 255, 0.5)",
-//       },
-//     ];
-//     return newData;
-//   });
-// };
-
-// const fetchHistory = async () => {
-//   if (!selected) return;
-//   const result = await context.fetchQuery([
-//     "exerciseTemplate.getHistory",
-//     { id: selected.id },
-//   ]);
-//   if (result?.Exercise) {
-//     const newData = result.Exercise.map((history) => {
-//       const date = history.date;
-//       if (!date)
-//         return {
-//           sets: history.ExerciseSets,
-//           year: 0,
-//           month: 0,
-//           day: 0,
-//         };
-//       return {
-//         sets: history.ExerciseSets,
-//         year: date.getFullYear(),
-//         month: date.getMonth(),
-//         day: date.getDay(),
-//       };
-//     });
-
-//     updateDataToDisplay(newData.filter((item) => item.year == year));
-//   }
-// };

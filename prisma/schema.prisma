@@ -81,12 +81,12 @@ model Workout {
 
 // The exercises a workout consists of
 model WorkoutExercise {
-    id                 Int               @id @default(autoincrement())
-    position           Int               @default(0)
+    id                 Int              @id @default(autoincrement())
+    position           Int              @default(0)
     Sets               Json?
-    ExerciseTemplate   ExerciseTemplate? @relation(fields: [exerciseTemplateId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-    exerciseTemplateId Int?
-    Workout            Workout?          @relation(fields: [workoutId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    ExerciseTemplate   ExerciseTemplate @relation(fields: [exerciseTemplateId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    exerciseTemplateId Int
+    Workout            Workout?         @relation(fields: [workoutId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     workoutId          Int?
 }
 
