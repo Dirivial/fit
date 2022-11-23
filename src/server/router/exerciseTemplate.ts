@@ -100,4 +100,18 @@ export const exerciseTemplate = createRouter()
         where: { userId: input.userId },
       });
     },
+  })
+  .query("delete", {
+    input: z.object({
+      templateId: z.number(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.exerciseTemplate.delete({
+        where: { id: input.templateId },
+        include: {
+          Exercise: true,
+          WorkoutExercise: true,
+        },
+      });
+    },
   });

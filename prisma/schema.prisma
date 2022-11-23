@@ -67,26 +67,26 @@ model Workout {
     user       User              @relation(fields: [userId], references: [id])
     userId     String
     Exercises  WorkoutExercise[]
-    Logs       WorkoutLog[]
+    //Logs       WorkoutLog[]
 }
 
-model WorkoutLog {
-    id                 Int      @id @default(autoincrement())
-    date               DateTime @default(now())
-    exercisesPerformed Int      @default(0)
+// model WorkoutLog {
+//     id                 Int      @id @default(autoincrement())
+//     date               DateTime @default(now())
+//     exercisesPerformed Int      @default(0)
 
-    Workout   Workout? @relation(fields: [workoutId], references: [id])
-    workoutId Int?
-}
+//     Workout   Workout? @relation(fields: [workoutId], references: [id])
+//     workoutId Int?
+// }
 
 // The exercises a workout consists of
 model WorkoutExercise {
-    id                 Int              @id @default(autoincrement())
-    position           Int              @default(0)
+    id                 Int               @id @default(autoincrement())
+    position           Int               @default(0)
     Sets               Json?
-    ExerciseTemplate   ExerciseTemplate @relation(fields: [exerciseTemplateId], references: [id])
-    exerciseTemplateId Int
-    Workout            Workout?         @relation(fields: [workoutId], references: [id])
+    ExerciseTemplate   ExerciseTemplate? @relation(fields: [exerciseTemplateId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    exerciseTemplateId Int?
+    Workout            Workout?          @relation(fields: [workoutId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     workoutId          Int?
 }
 
@@ -95,7 +95,7 @@ model Exercise {
     id                 Int               @id @default(autoincrement())
     ExerciseSets       ExerciseSet[]
     date               DateTime?         @default(now())
-    ExerciseTemplate   ExerciseTemplate? @relation(fields: [exerciseTemplateId], references: [id])
+    ExerciseTemplate   ExerciseTemplate? @relation(fields: [exerciseTemplateId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     exerciseTemplateId Int?
 }
 
@@ -104,7 +104,7 @@ model ExerciseSet {
     id         Int       @id @default(autoincrement())
     reps       Int       @default(5)
     weight     Float     @default(0)
-    Exercise   Exercise? @relation(fields: [exerciseId], references: [id])
+    Exercise   Exercise? @relation(fields: [exerciseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     exerciseId Int?
 }
 

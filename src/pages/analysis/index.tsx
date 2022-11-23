@@ -20,6 +20,8 @@ import { Line } from "react-chartjs-2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Tab } from "@headlessui/react";
+import SearchForTemplate from "../../components/SearchForTemplate";
+import { ExerciseTemplate } from "@prisma/client";
 
 ChartJS.register(
   CategoryScale,
@@ -130,7 +132,7 @@ const AnalyzePage: NextPage = () => {
   ]).data;
 
   const [isWaiting, setIsWaiting] = useState(true);
-  const [selectedIndex, setSelectedIndex] = useState(1);
+  const [selected, setSelected] = useState<ExerciseTemplate>();
 
   const [dataToDisplay, setDataToDisplay] = useState<
     ChartData<"line", (number | ScatterDataPoint | null)[], unknown>
@@ -353,6 +355,20 @@ const AnalyzePage: NextPage = () => {
     });
   }, [parsedDataPoints]);
 
+  const deleteExercise = async () => {
+    if (!selected) {
+      return;
+    }
+    console.log("Deleting exercise: ", selected);
+
+    const res = await context.fetchQuery([
+      "exerciseTemplate.delete",
+      { templateId: selected.id },
+    ]);
+    console.log("Deleted. ", res);
+    // Now remove the exercise from the exercises variable
+  };
+
   // Options for the graph
   const options = {
     responsive: true,
@@ -457,17 +473,17 @@ const AnalyzePage: NextPage = () => {
         <div className="flex gap-3">
           {
             // The following will be used later when user wants to look at a specific exercise/workout
-            /* <SearchForTemplate
-            setSelectedExercise={(exercise) => setSelected(exercise)}
-            templates={() => (exercises.data ? exercises.data : [])}
-          /> */
+            <SearchForTemplate
+              setSelectedExercise={(exercise) => setSelected(exercise)}
+              templates={() => (exercises ? exercises : [])}
+            />
           }
-          {/* <button
-            onClick={() => console.log("lmao")}
+          <button
+            onClick={() => deleteExercise()}
             className="text-lg text-gray-200 rounded border-2 border-violet-800 bg-violet-800 p-1"
           >
-            Load
-          </button> */}
+            Delete
+          </button>
         </div>
       </main>
     </>
